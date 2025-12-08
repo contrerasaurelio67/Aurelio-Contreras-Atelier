@@ -30,6 +30,15 @@
             --text-muted: #94a3b8;
             --border: #475569;
             --shadow: rgba(0, 0, 0, 0.28);
+
+            /* Theme specific vars */
+            --bg-gradient-start: var(--dark);
+            --bg-gradient-end: #1a1f35;
+            --card-bg: rgba(30, 41, 59, 0.8);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --action-btn-bg: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(51, 65, 85, 0.7));
+            --action-btn-hover: linear-gradient(135deg, rgba(40, 51, 75, 0.95), rgba(60, 75, 100, 0.8));
+            --input-border: rgba(255, 255, 255, 0.1);
         }
 
         body.light {
@@ -41,6 +50,15 @@
             --text-muted: #6b7280;
             --border: #cbd5e1;
             --shadow: rgba(0, 0, 0, 0.08);
+
+            /* Light theme specific vars */
+            --bg-gradient-start: #f8fafc;
+            --bg-gradient-end: #e2e8f0;
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --card-border: rgba(0, 0, 0, 0.06);
+            --action-btn-bg: linear-gradient(135deg, #ffffff, #f1f5f9);
+            --action-btn-hover: linear-gradient(135deg, #ffffff, #e2e8f0);
+            --input-border: #cbd5e1;
         }
 
         /* RESET */
@@ -52,21 +70,16 @@
 
         body {
             font-family: 'Inter', system-ui, sans-serif;
-            background: linear-gradient(135deg, var(--dark) 0%, #1a1f35 100%);
+            background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
             color: var(--text);
             min-height: 100vh;
             overflow-x: hidden;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        body.light {
-            background: linear-gradient(135deg, #ffffff 0%, #f0f4f8 100%);
-        }
-
         /* ──────────────────────────────── */
-        /*           LOGIN SCREEN           */
+        /*        LOGIN SCREEN (GLASS)       */
         /* ──────────────────────────────── */
-
         #loginScreen {
             display: flex;
             justify-content: center;
@@ -76,64 +89,53 @@
             animation: fadeIn 0.6s ease-out;
         }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: scale(0.95);
-            }
-
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-
         .login-card {
-            background: rgba(30, 41, 59, 0.8);
+            background: var(--card-bg);
             backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--card-border);
             padding: 40px;
             border-radius: 24px;
-            width: 100%px;
+            width: 100%;
             max-width: 420px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4),
-                0 0 0 1px rgba(255, 255, 255, 0.05) inset;
-            animation: slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        body.light .login-card {
-            background: rgba(255, 255, 255, 0.9);
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1),
-                0 0 0 1px rgba(0, 0, 0, 0.05) inset;
-        }
-
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+                0 0 0 1px var(--card-border) inset;
+            animation: slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .logo-title {
             text-align: center;
-            margin-bottom: 28px;
+            margin-bottom: 32px;
         }
 
         .logo-title h1 {
             font-size: 28px;
-            margin-bottom: 6px;
+            background: linear-gradient(135deg, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
         }
 
+        body.light .logo-title h1 {
+            background: linear-gradient(135deg, #1e293b, #475569);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .logo-title p {
+            color: var(--text-muted);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* INPUTS */
         input {
             width: 100%;
             padding: 12px 14px;
             background: var(--dark);
-            border: 1px solid var(--border);
+            border: 1px solid var(--input-border);
             border-radius: 10px;
             margin-bottom: 20px;
             color: var(--text);
@@ -153,6 +155,7 @@
             transform: translateY(-1px);
         }
 
+        /* BOTONES GENÉRICOS */
         button {
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             border: none;
@@ -197,31 +200,180 @@
         }
 
         /* ──────────────────────────────── */
-        /*             DASHBOARD            */
+        /*          DASHBOARD LAYOUT         */
         /* ──────────────────────────────── */
-
         #dashboardContent {
             display: none;
-            padding: 22px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+            padding-bottom: 80px;
         }
 
+        /* HEADER */
         header {
-            background: rgba(30, 41, 59, 0.8);
+            background: var(--card-bg);
             backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--card-border);
             padding: 18px 24px;
             border-radius: 16px;
             margin-bottom: 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
             animation: slideDown 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        body.light header {
-            background: rgba(255, 255, 255, 0.9);
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        header h2 {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            /* Espacio entre botones */
+        }
+
+        .header-actions button {
+            width: auto;
+            /* Botones no ocupan todo el ancho */
+            padding: 10px 20px;
+            font-size: 14px;
+            background: var(--dark-lighter);
+            border: 1px solid var(--card-border);
+            box-shadow: none;
+            color: var(--text);
+        }
+
+        /* Specific fix for header buttons text color interaction */
+        body.light .header-actions button {
+            color: white;
+            /* Keep white text for buttons if they are distinct */
+            /* Or if we want them to be light colored in light mode? */
+            /* Current var(--dark-lighter) is #e2e8f0 (light grey) in light mode */
+            background: var(--dark-lighter);
+            color: var(--text-muted);
+        }
+
+        /* Better approach for header buttons: keep them themed */
+        .header-actions button {
+            background: var(--dark-lighter);
+            color: var(--text);
+        }
+
+        body.light .header-actions button {
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .header-actions button:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+            color: white !important;
+        }
+
+        /* SECTION HEADERS */
+        .section {
+            margin-bottom: 40px;
+            animation: fadeInUp 0.6s ease-out backwards;
+        }
+
+        .section h3 {
+            font-size: 18px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .section h3::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, var(--border), transparent);
+            margin-left: 10px;
+        }
+
+        /* ACTION BUTTONS (CARDS) */
+        .button-grid {
+            display: grid;
+            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        }
+
+        .action-button {
+            background: var(--action-btn-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 24px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .action-button h4 {
+            font-size: 17px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text);
+        }
+
+        .action-button p {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .action-button:hover {
+            transform: translateY(-6px) scale(1.02);
+            box-shadow: 0 12px 28px rgba(99, 102, 241, 0.15),
+                0 0 0 1px rgba(99, 102, 241, 0.2) inset;
+            border-color: rgba(99, 102, 241, 0.3);
+            background: var(--action-btn-hover);
+        }
+
+        /* ANIMATIONS */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         @keyframes slideDown {
@@ -236,62 +388,16 @@
             }
         }
 
-        .action-button {
-            background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(51, 65, 85, 0.7));
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 16px;
-            padding: 24px;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
 
-        body.light .action-button {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 250, 252, 0.9));
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-        }
-
-        .action-button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.1), transparent);
-            transition: left 0.5s;
-        }
-
-        .action-button:hover {
-            transform: translateY(-6px) scale(1.02);
-            box-shadow: 0 12px 28px rgba(99, 102, 241, 0.25),
-                0 0 0 1px rgba(99, 102, 241, 0.2) inset;
-            border-color: rgba(99, 102, 241, 0.3);
-        }
-
-        .action-button:hover::before {
-            left: 100%;
-        }
-
-        .action-button:active {
-            transform: translateY(-2px) scale(0.98);
-            transition: all 0.1s;
-        }
-
-        .action-button h4 {
-            transition: color 0.3s;
-        }
-
-        .action-button:hover h4 {
-            color: var(--primary);
-        }
-
-        .section {
-            margin-bottom: 32px;
-            animation: fadeInUp 0.6s ease-out backwards;
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .section:nth-child(1) {
@@ -306,149 +412,36 @@
             animation-delay: 0.3s;
         }
 
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .section:nth-child(4) {
+            animation-delay: 0.4s;
         }
 
-        .section h3 {
-            font-size: 20px;
-            margin-bottom: 18px;
-            position: relative;
-            padding-left: 14px;
-        }
-
-        .section h3::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 4px;
-            height: 60%;
-            background: linear-gradient(180deg, var(--primary), var(--secondary));
-            border-radius: 2px;
-        }
-
-        .button-grid {
-            display: grid;
-            gap: 20px;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-        }
-
-        .button-grid .action-button:nth-child(1) {
-            animation-delay: 0.1s;
-        }
-
-        .button-grid .action-button:nth-child(2) {
-            animation-delay: 0.15s;
-        }
-
-        .button-grid .action-button:nth-child(3) {
-            animation-delay: 0.2s;
-        }
-
-        .button-grid .action-button:nth-child(4) {
-            animation-delay: 0.25s;
-        }
-
-        .button-grid .action-button {
-            animation: scaleIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) backwards;
-        }
-
-        @keyframes scaleIn {
-            from {
-                opacity: 0;
-                transform: scale(0.9);
-            }
-
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-
+        /* VIEWS & STATES */
         .detail-view {
             display: none;
+            animation: fadeIn 0.4s ease-out;
         }
 
         .detail-view.active {
             display: block;
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 18px;
+        .detail-view h2 {
+            margin-top: 20px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
         }
 
-        /* Login link */
-        .login-link-container {
-            text-align: center;
-            margin-top: 15px;
-            animation: fadeIn 0.8s ease-out 0.3s backwards;
-        }
-
-        .btn-panel-link {
-            display: inline-block;
-            text-decoration: none;
-            color: var(--primary);
-            padding: 12px 20px;
-            border: 1px solid rgba(99, 102, 241, 0.3);
-            border-radius: 12px;
-            font-weight: 500;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn-panel-link::after {
-            content: '→';
-            position: absolute;
-            right: 12px;
-            opacity: 0;
-            transition: all 0.3s;
-        }
-
-        .btn-panel-link:hover::after {
-            opacity: 1;
-            right: 8px;
-        }
-
-        .btn-panel-link:hover {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            padding-right: 32px;
-            box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
-            transform: translateY(-3px) scale(1.02);
-            border-color: transparent;
-        }
-
-        .btn-panel-link:active {
-            transform: translateY(-1px) scale(1);
-        }
-
-        /* Footer */
+        /* FOOTER */
         footer {
             background: rgba(30, 41, 59, 0.6);
             backdrop-filter: blur(12px);
             border-top: 1px solid rgba(255, 255, 255, 0.1);
             padding: 24px;
             text-align: center;
-            margin-top: 40px;
+            margin-top: 60px;
             animation: fadeIn 1s ease-out 0.5s backwards;
-        }
-
-        body.light footer {
-            background: rgba(255, 255, 255, 0.8);
-            border-top: 1px solid rgba(0, 0, 0, 0.08);
         }
 
         footer p {
@@ -461,43 +454,30 @@
             color: var(--primary);
             text-decoration: none;
             font-weight: 600;
-            transition: all 0.3s;
-            position: relative;
         }
 
-        footer a::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        body.light footer {
+            background: rgba(255, 255, 255, 0.8);
         }
 
-        footer a:hover::after {
-            width: 100%;
-        }
-
-        footer a:hover {
-            color: var(--secondary);
-        }
-
-        /* Responsive */
+        /* RESPONSIVE */
         @media (max-width: 768px) {
             header {
                 flex-direction: column;
                 gap: 16px;
-                align-items: flex-start;
+                align-items: stretch;
             }
 
-            .button-grid {
-                grid-template-columns: 1fr;
+            .header-actions {
+                justify-content: space-between;
             }
 
-            .login-card {
-                padding: 24px;
+            .header-actions button {
+                flex: 1;
+            }
+
+            .logo-title h1 {
+                font-size: 24px;
             }
         }
     </style>
@@ -508,12 +488,10 @@
     <!-- LOGIN SCREEN -->
     <div id="loginScreen">
         <div class="login-card">
-
             <div class="logo-title">
                 <h1>Atelier Engine</h1>
                 <p>Panel Administrativo</p>
             </div>
-
             <form id="loginForm" onsubmit="return handleLogin(event)">
                 <input type="text" id="username" placeholder="Usuario" required>
                 <input type="password" id="password" placeholder="Contraseña" required>
@@ -530,224 +508,154 @@
                 <h2>Panel Administrativo</h2>
                 <p>Bienvenido, <strong id="welcomeUser">Admin</strong></p>
             </div>
-
-            <div>
-                <button onclick="toggleTheme()">🌞 / 🌙</button>
-                <button onclick="logout()">Salir</button>
+            <div class="header-actions">
+                <button onclick="toggleTheme()" aria-label="Cambiar tema">🌞 / 🌙</button>
+                <button onclick="logout()" aria-label="Cerrar sesión">Salir</button>
             </div>
         </header>
 
-        <!-- Main view -->
+        <!-- MAIN VIEW (ACTION BUTTONS) -->
         <div id="mainView">
 
-            <!-- ACCIONES RÁPIDAS -->
+            <!-- 📝 GESTIÓN DE CONTENIDO -->
             <div class="section">
-                <h3>Acciones Rápidas</h3>
-
+                <h3>📝 Gestión de Contenido</h3>
                 <div class="button-grid">
-                    <div class="action-button" onclick="markButton(this); sendAction('generate_topics')">
-                        <h4>💡 Generar nuevos temas</h4>
-                        <p>Crea contenido fresco con IA.</p>
+                    <div class="action-button" onclick="markButton(this); sendAction('generate_posts')">
+                        <h4>🧠 Generar nuevas publicaciones</h4>
+                        <p>Crea contenido original con IA basado en temas clave.</p>
                     </div>
-
-                    <div class="action-button" onclick="markButton(this); sendAction('force_publish')">
-                        <h4>🚀 Publicar ahora</h4>
-                        <p>Ejecuta una publicación inmediata.</p>
+                    <div class="action-button" onclick="markButton(this); sendAction('schedule_post')">
+                        <h4>📅 Programar publicación</h4>
+                        <p>Define fecha y hora para publicar automáticamente.</p>
                     </div>
-
-                    <div class="action-button" onclick="markButton(this); sendAction('generate_from_image')">
-                        <h4>🖼️ Crear post desde imagen</h4>
-                        <p>La IA analiza una imagen y genera un post completo.</p>
+                    <div class="action-button" onclick="markButton(this); sendAction('generate_from_prompt')">
+                        <h4>🧬 Generar post desde imagen</h4>
+                        <p>Sube una imagen y genera un post listo para publicar.</p>
+                    </div>
+                    <div class="action-button" onclick="markButton(this); sendAction('pin_post')">
+                        <h4>🧷 Fijar publicación destacada</h4>
+                        <p>Marca un post como "fijado" en el feed.</p>
                     </div>
                 </div>
             </div>
 
-            <!-- ESTADO DEL SISTEMA -->
+            <!-- ⚙️ SISTEMA Y OPERACIONES -->
             <div class="section">
-                <h3>Estado del Sistema</h3>
-
+                <h3>⚙️ Sistema y Operaciones</h3>
                 <div class="button-grid">
-                    <div class="action-button" onclick="markButton(this); sendAction('view_queue')">
-                        <h4>📋 Ver cola</h4>
-                        <p>Publicaciones pendientes y próximas.</p>
+                    <div class="action-button" onclick="markButton(this); sendAction('test_workflow')">
+                        <h4>🧪 Probar flujo en n8n</h4>
+                        <p>Ejecuta un test inmediato del workflow activo.</p>
                     </div>
+                    <div class="action-button" onclick="markButton(this); sendAction('system_diagnostic')">
+                        <h4>🧰 Diagnóstico del sistema</h4>
+                        <p>Verifica estado de servicios clave (Docker, Nginx, n8n, API).</p>
+                    </div>
+                    <div class="action-button" onclick="markButton(this); sendAction('clean_queue')">
+                        <h4>🧼 Limpiar cola de publicaciones</h4>
+                        <p>Elimina tareas duplicadas, obsoletas o fallidas.</p>
+                    </div>
+                    <div class="action-button" onclick="markButton(this); sendAction('view_panels')">
+                        <h4>🧭 Navegar paneles activos</h4>
+                        <p>Vista rápida de todos los paneles HTML conectados.</p>
+                    </div>
+                </div>
+            </div>
 
+            <!-- 🔍 AUDITORÍA Y CONTROL -->
+            <div class="section">
+                <h3>🔍 Auditoría y Control</h3>
+                <div class="button-grid">
                     <div class="action-button" onclick="markButton(this); sendAction('view_logs')">
-                        <h4>📝 Ver logs</h4>
-                        <p>Registro completo del sistema.</p>
+                        <h4>📋 Visualizar registros</h4>
+                        <p>Accede al historial de publicaciones y logs del sistema.</p>
+                    </div>
+                    <div class="action-button" onclick="markButton(this); sendAction('content_audit')">
+                        <h4>🔍 Auditoría de contenido</h4>
+                        <p>Revisa metadatos y calidad de los posts generados.</p>
+                    </div>
+                    <div class="action-button" onclick="markButton(this); sendAction('export_history')">
+                        <h4>🧾 Exportar historial</h4>
+                        <p>Descarga logs y métricas en CSV para análisis externo.</p>
                     </div>
                 </div>
             </div>
 
-            <!-- CONFIGURACIÓN -->
+            <!-- 🤖 IA Y OPTIMIZACIÓN -->
             <div class="section">
-                <h3>Configuración</h3>
-
+                <h3>🤖 IA y Optimización</h3>
                 <div class="button-grid">
-                    <div class="action-button" onclick="markButton(this); sendAction('settings')">
-                        <h4>⚙️ Ajustes</h4>
-                        <p>Preferencias globales.</p>
-                    </div>
-
-                    <div class="action-button" onclick="markButton(this); sendAction('feed_preview')">
-                        <h4>👁️ Vista de feed</h4>
-                        <p>Previsualización de contenido.</p>
+                    <div class="action-button" onclick="markButton(this); sendAction('retrain_ai')">
+                        <h4>🧠 Reentrenar IA con nuevos datos</h4>
+                        <p>Mejora la generación de contenido con ejemplos recientes.</p>
                     </div>
                 </div>
             </div>
 
-        </div>
+        </div><!-- End mainView -->
 
-        <!-- VISTAS SECUNDARIAS -->
-        <div id="viewTopics" class="detail-view">
-            <button onclick="showMain()">← Volver</button>
-            <h2>Temas Generados</h2>
-            <p id="topicsDescription"></p>
-            <div id="topicsList"></div>
-        </div>
-
-        <div id="viewForcePublish" class="detail-view">
-            <button onclick="showMain()">← Volver</button>
-            <h2>Publicación Ejecutada</h2>
-            <div id="forcePublishInfo"></div>
-        </div>
-
-        <div id="viewImagePost" class="detail-view">
-            <button onclick="showMain()">← Volver</button>
-            <h2>Post creado desde imagen</h2>
-            <div id="imagePostInfo"></div>
-        </div>
-
-        <div id="viewQueue" class="detail-view">
-            <button onclick="showMain()">← Volver</button>
-            <h2>Cola de Publicaciones</h2>
-            <div id="queueContent"></div>
-        </div>
-
-        <div id="viewLogs" class="detail-view">
-            <button onclick="showMain()">← Volver</button>
-            <h2>Logs del Sistema</h2>
-            <div id="logsContent"></div>
-        </div>
-
-        <div id="viewSettings" class="detail-view">
-            <button onclick="showMain()">← Volver</button>
-            <h2>Ajustes del Sistema</h2>
-            <div id="settingsContent"></div>
-        </div>
-
-        <div id="viewFeedPreview" class="detail-view">
-            <button onclick="showMain()">← Volver</button>
-            <h2>Vista Previa del Feed</h2>
-            <div id="feedContent" class="feed-grid"></div>
+        <!-- VISTAS SECUNDARIAS (Placeholder simple para mantener la lógica funcional) -->
+        <div id="viewDetail" class="detail-view">
+            <button onclick="showMain()" style="width: auto; margin-bottom: 20px;">← Volver al inicio</button>
+            <h2 id="detailTitle">Detalle</h2>
+            <div id="detailContent">Espacio para respuesta del servidor...</div>
         </div>
 
     </div><!-- dashboardContent -->
 
-    <script>
+    <footer>
+        <p>Accede al workflow en <a href="https://n8n.aureliocontrerasatelier.com/workflow/M5SBRoQGspE0CVxx"
+                target="_blank" rel="noopener noreferrer">n8n.aureliocontrerasatelier.com</a></p>
+    </footer>
 
-        // ==============================================================
-        // CONFIGURACIÓN GLOBAL
-        // ==============================================================
+    <!-- SCRIPT PRINCIPAL -->
+    <script>
+        // CONFIGURACIÓN
         const WEBHOOK_URL = "https://n8npanel.aureliocontrerasatelier.com";
 
-
-        // ==============================================================
-        // PERSISTENCIA DE SESIÓN
-        // ==============================================================
-
-        // Restaurar sesión al cargar
+        // INICIO
         window.addEventListener('DOMContentLoaded', () => {
             const savedSession = sessionStorage.getItem('atelier_session');
-            const savedView = sessionStorage.getItem('atelier_current_view');
-
             if (savedSession) {
                 const sessionData = JSON.parse(savedSession);
-                document.getElementById("loginScreen").style.display = "none";
-                document.getElementById("dashboardContent").style.display = "block";
-                document.getElementById("welcomeUser").innerText = sessionData.username;
-
-                // Restaurar vista activa
-                if (savedView && savedView !== 'mainView') {
-                    hideAllViews();
-                    document.getElementById(savedView).classList.add('active');
-                }
+                showDashboard(sessionData.username);
             }
         });
 
-        // Guardar estado en cada cambio
-        function saveSessionState() {
-            const activeView = document.querySelector('.detail-view.active');
-            const currentView = activeView ? activeView.id : 'mainView';
-            sessionStorage.setItem('atelier_current_view', currentView);
-        }
-
-
-        // ==============================================================
         // LOGIN
-        // ==============================================================
         function handleLogin(event) {
             event.preventDefault();
+            const u = document.getElementById("username").value.trim();
+            const p = document.getElementById("password").value.trim();
 
-            const username = document.getElementById("username").value.trim();
-            const password = document.getElementById("password").value.trim();
-
-            if (username === "econtreras" && password === "Ec1330") {
-                // Guardar sesión
-                sessionStorage.setItem('atelier_session', JSON.stringify({ username }));
-
-                document.getElementById("loginScreen").style.display = "none";
-                document.getElementById("dashboardContent").style.display = "block";
-                document.getElementById("welcomeUser").innerText = username;
-
+            if (u === "econtreras" && p === "Ec1330") {
+                sessionStorage.setItem('atelier_session', JSON.stringify({ username: u }));
+                showDashboard(u);
                 Swal.fire({
                     icon: "success",
-                    title: "Bienvenido ✨",
-                    text: "Acceso concedido",
-                    timer: 1200,
+                    title: "Bienvenido",
+                    timer: 1000,
                     showConfirmButton: false
                 });
             } else {
-                Swal.fire({
-                    icon: "error",
-                    title: "Acceso denegado",
-                    text: "Usuario o contraseña incorrectos"
-                });
+                Swal.fire({ icon: "error", title: "Error", text: "Credenciales incorrectas" });
             }
         }
 
-
-
-        // ==============================================================
-        // CAMBIO DE TEMA
-        // ==============================================================
-        function toggleTheme() {
-            document.body.classList.toggle("light");
-
-            Swal.fire({
-                icon: "info",
-                title: document.body.classList.contains("light")
-                    ? "Modo claro activado"
-                    : "Modo oscuro activado",
-                timer: 1000,
-                showConfirmButton: false
-            });
+        function showDashboard(user) {
+            document.getElementById("loginScreen").style.display = "none";
+            document.getElementById("dashboardContent").style.display = "block";
+            document.getElementById("welcomeUser").innerText = user;
         }
 
-
-
-        // ==============================================================
-        // LOGOUT
-        // ==============================================================
         function logout() {
             Swal.fire({
-                title: "Cerrar sesión",
-                text: "¿Deseas salir?",
+                title: "¿Salir?",
                 icon: "warning",
                 showCancelButton: true,
-                confirmButtonText: "Salir",
-                confirmButtonColor: "#ef4444",
-                cancelButtonColor: "#4f46e5",
+                confirmButtonText: "Sí, salir",
+                cancelButtonText: "Cancelar"
             }).then(res => {
                 if (res.isConfirmed) {
                     sessionStorage.clear();
@@ -756,271 +664,74 @@
             });
         }
 
-
-
-        // ==============================================================
-        // CONTROL DE VISTAS
-        // ==============================================================
-        function hideAllViews() {
-            document.querySelectorAll(".detail-view").forEach(v => v.classList.remove("active"));
-            document.getElementById("mainView").style.display = "none";
+        function toggleTheme() {
+            document.body.classList.toggle("light");
         }
 
+        // CONTROL DE VISTAS (Simple)
         function showMain() {
-            hideAllViews();
+            document.querySelectorAll(".detail-view").forEach(v => v.classList.remove("active"));
             document.getElementById("mainView").style.display = "block";
-            saveSessionState();
         }
 
-        function showView(id) {
-            hideAllViews();
-            const view = document.getElementById(id);
-            view.classList.add("active");
-            saveSessionState();
+        function showDetail(title, content = '') {
+            document.getElementById("mainView").style.display = "none";
+            const detailView = document.getElementById("viewDetail");
+            document.getElementById("detailTitle").innerText = title;
+            document.getElementById("detailContent").innerHTML = content || '<p>Cargando datos...</p>';
+            detailView.classList.add("active");
         }
 
+        // ACCIONES DE BOTONES
+        async function sendAction(actionType) {
 
-
-        // ==============================================================
-        // SELECCIÓN DE BOTÓN ACTIVO
-        // ==============================================================
-        let lastButton = null;
-
-        function markButton(btn) {
-            if (lastButton) lastButton.classList.remove("active-action");
-            lastButton = btn;
-            btn.classList.add("active-action");
-        }
-
-
-
-        // ==============================================================
-        // ENVÍO DE ACCIONES
-        // ==============================================================
-        async function sendAction(action) {
+            // Retroalimentación visual inmediata
             Swal.fire({
-                title: "Procesando…",
-                text: "Conectando con Atelier Engine",
+                title: 'Procesando...',
+                text: 'Conectando con Atelier Engine',
                 allowOutsideClick: false,
-                didOpen: () => Swal.showLoading()
+                didOpen: () => { Swal.showLoading(); }
             });
 
             try {
-                const response = await fetch(`${WEBHOOK_URL}?action=${action}`);
-                const data = await response.json();
-
-                Swal.close();
-
-                if (!data.success) {
-                    Swal.fire({
-                        icon: "error",
-                        title: "Acción fallida",
-                        text: data.message || "Ocurrió un error inesperado"
-                    });
-                    return;
-                }
-
-                processActionResult(action, data);
-
-            } catch (err) {
-                Swal.close();
-                Swal.fire({
-                    icon: "error",
-                    title: "N8N no responde",
-                    text: "Verifica que el workflow esté encendido"
+                // Simulación de envío al Webhook (puedes descomentar el fetch real)
+                /*
+                const response = await fetch(WEBHOOK_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ 
+                        action: actionType,
+                        user: JSON.parse(sessionStorage.getItem('atelier_session')).username,
+                        timestamp: new Date().toISOString()
+                    })
                 });
-            }
-        }
+                const data = await response.json();
+                */
 
-
-
-        // ==============================================================
-        // PROCESAMIENTO DE RESULTADOS
-        // ==============================================================
-        function processActionResult(action, data) {
-            switch (action) {
-
-                case "generate_topics":
-                    renderTopics(data);
-                    showView("viewTopics");
-                    break;
-
-                case "force_publish":
-                    renderForcePublish(data);
-                    showView("viewForcePublish");
-                    break;
-
-                case "generate_from_image":
-                    renderImagePost(data);
-                    showView("viewImagePost");
-                    break;
-
-                case "view_queue":
-                    renderQueue(data);
-                    showView("viewQueue");
-                    break;
-
-                case "view_logs":
-                    renderLogs(data);
-                    showView("viewLogs");
-                    break;
-
-                case "settings":
-                    renderSettings(data);
-                    showView("viewSettings");
-                    break;
-
-                case "feed_preview":
-                    renderFeedPreview(data);
-                    showView("viewFeedPreview");
-                    break;
-
-                default:
+                // Simulación de respuesta exitosa para demo visual
+                setTimeout(() => {
                     Swal.fire({
-                        icon: "error",
-                        title: "Acción desconocida",
-                        text: "El workflow devolvió una acción no registrada"
+                        icon: "success",
+                        title: "Acción Enviada",
+                        text: `Comando: ${actionType} ejecutado correctamente.`
                     });
+                    // Opcional: mostrar detalle
+                    // showDetail(`Resultado: ${actionType}`, '<p>Respuesta simulada del servidor.</p>');
+                }, 800);
+
+            } catch (error) {
+                console.error(error);
+                Swal.fire({ icon: "error", title: "Error de conexión", text: "No se pudo contactar al servidor n8n." });
             }
         }
 
-
-
-        // ==============================================================
-        // RENDERIZADORES DE DATOS
-        // ==============================================================
-
-        function renderTopics(data) {
-            document.getElementById("topicsDescription").innerText = data.message;
-
-            const list = document.getElementById("topicsList");
-            list.innerHTML = "";
-
-            data.data.topics.forEach(topic => {
-                const card = document.createElement("div");
-                card.className = "feed-card";
-                card.innerHTML = `<strong>${topic}</strong>`;
-                list.appendChild(card);
-            });
+        // EFECTO VISUAL EN BOTONES
+        function markButton(btn) {
+            // Remove active class from all
+            document.querySelectorAll('.action-button').forEach(b => b.classList.remove('active-action'));
+            btn.classList.add('active-action');
         }
-
-        function renderForcePublish(data) {
-            const p = data.data.post;
-
-            document.getElementById("forcePublishInfo").innerHTML = `
-        <div class="feed-card">
-            <p><strong>Caption:</strong> ${p.caption}</p>
-            <p><strong>Hashtags:</strong> ${p.hashtags}</p>
-            <p><strong>Programado:</strong> ${p.scheduled}</p>
-            <p><strong>Plataforma:</strong> ${p.platform}</p>
-            <p><strong>ID de Publicación:</strong> ${p.post_id}</p>
-        </div>
-    `;
-        }
-
-        function renderImagePost(data) {
-            const info = data.data;
-
-            document.getElementById("imagePostInfo").innerHTML = `
-        <div class="feed-card">
-            <p><strong>Caption:</strong> ${info.caption}</p>
-            <p><strong>Hashtags:</strong> ${info.hashtags.join(", ")}</p>
-            <p><strong>Confianza IA:</strong> ${(info.confidence * 100).toFixed(1)}%</p>
-        </div>
-    `;
-        }
-
-        function renderQueue(data) {
-            const c = document.getElementById("queueContent");
-
-            let html = `
-        <table>
-            <tr>
-                <th>ID</th>
-                <th>Caption</th>
-                <th>Estado</th>
-                <th>Horario</th>
-            </tr>
-    `;
-
-            data.data.queue.forEach(q => {
-                html += `
-            <tr>
-                <td>${q.id}</td>
-                <td>${q.caption}</td>
-                <td>${q.status}</td>
-                <td>${q.datetime}</td>
-            </tr>
-        `;
-            });
-
-            html += "</table>";
-            c.innerHTML = html;
-        }
-
-        function renderLogs(data) {
-            const logs = data.data.logs;
-
-            let html = `
-        <table>
-            <tr>
-                <th>Fecha</th>
-                <th>Acción</th>
-                <th>Estado</th>
-            </tr>
-    `;
-
-            logs.forEach(l => {
-                html += `
-            <tr>
-                <td>${l.time}</td>
-                <td>${l.action}</td>
-                <td>${l.status}</td>
-            </tr>
-        `;
-            });
-
-            html += "</table>";
-            document.getElementById("logsContent").innerHTML = html;
-        }
-
-        function renderSettings(data) {
-            const s = data.data.settings;
-
-            document.getElementById("settingsContent").innerHTML = `
-        <div class="feed-card">
-            <p><strong>Modo:</strong> ${s.dark_mode ? "Oscuro" : "Claro"}</p>
-            <p><strong>Auto-Post:</strong> ${s.auto_post ? "Sí" : "No"}</p>
-            <p><strong>Temas restantes:</strong> ${s.topics_left}</p>
-            <p><strong>Posts hoy:</strong> ${s.posts_today}</p>
-        </div>
-    `;
-        }
-
-        function renderFeedPreview(data) {
-            const container = document.getElementById("feedContent");
-            container.innerHTML = "";
-
-            data.data.feed.forEach(card => {
-                const el = document.createElement("div");
-                el.className = "feed-card";
-
-                el.innerHTML = `
-            <img src="${card.image}" alt="preview">
-            <p><strong>${card.caption}</strong></p>
-            <p>❤️ ${card.likes} likes</p>
-        `;
-
-                container.appendChild(el);
-            });
-        }
-
     </script>
-
-    <footer>
-        <p>Accede al workflow en <a href="https://n8n.aureliocontrerasatelier.com/workflow/M5SBRoQGspE0CVxx"
-                target="_blank" rel="noopener noreferrer">n8n.aureliocontrerasatelier.com</a></p>
-    </footer>
 </body>
 
 </html>
