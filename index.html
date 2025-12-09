@@ -694,17 +694,27 @@
             });
 
             try {
-                // Envío al Webhook
+                // Envío al Webhook con API Key
                 const response = await fetch(WEBHOOK_URL, {
                     method: "POST",
-                    headers: { "Content-Type": "application/json" },
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-N8N-API-KEY": "mi_clave_fija_123456"   // 👈 tu API key
+                    },
                     body: JSON.stringify({
                         action: actionType,
                         user: JSON.parse(sessionStorage.getItem('atelier_session'))?.username || "invitado",
                         timestamp: new Date().toISOString()
                     })
                 });
-                const data = await response.json();
+
+                // Manejo flexible de la respuesta (JSON o texto)
+                let data;
+                try {
+                    data = await response.json();
+                } catch {
+                    data = await response.text();
+                }
 
                 // Respuesta exitosa
                 Swal.fire({
@@ -715,7 +725,11 @@
 
             } catch (error) {
                 console.error(error);
-                Swal.fire({ icon: "error", title: "Error de conexión", text: "No se pudo contactar al servidor n8n." });
+                Swal.fire({
+                    icon: "error",
+                    title: "Error de conexión",
+                    text: "No se pudo contactar al servidor n8n."
+                });
             }
         }
 
