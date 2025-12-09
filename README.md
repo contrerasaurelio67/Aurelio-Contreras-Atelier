@@ -16,7 +16,7 @@ Su propósito es servir como punto central para gestionar flujos, desplegar camb
 
 🌐 Acceso
 El panel está disponible en línea en:
-👉 https://n8npanelatelier.netlify.app
+👉 https://n8npanel.aureliocontrerasatelier.com
 
 📌 Estado
 Este repositorio se encuentra en una versión estable y lista para usarse.
