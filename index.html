@@ -612,7 +612,7 @@
     <!-- SCRIPT PRINCIPAL -->
     <script>
         // CONFIGURACIÓN
-        const WEBHOOK_URL = "https://n8npanel.aureliocontrerasatelier.com";
+        const WEBHOOK_URL = "https://n8n.aureliocontrerasatelier.com/webhook/panel-action";
 
         // INICIO
         window.addEventListener('DOMContentLoaded', () => {
@@ -694,30 +694,24 @@
             });
 
             try {
-                // Simulación de envío al Webhook (puedes descomentar el fetch real)
-                /*
+                // Envío al Webhook
                 const response = await fetch(WEBHOOK_URL, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ 
+                    body: JSON.stringify({
                         action: actionType,
-                        user: JSON.parse(sessionStorage.getItem('atelier_session')).username,
+                        user: JSON.parse(sessionStorage.getItem('atelier_session'))?.username || "invitado",
                         timestamp: new Date().toISOString()
                     })
                 });
                 const data = await response.json();
-                */
 
-                // Simulación de respuesta exitosa para demo visual
-                setTimeout(() => {
-                    Swal.fire({
-                        icon: "success",
-                        title: "Acción Enviada",
-                        text: `Comando: ${actionType} ejecutado correctamente.`
-                    });
-                    // Opcional: mostrar detalle
-                    // showDetail(`Resultado: ${actionType}`, '<p>Respuesta simulada del servidor.</p>');
-                }, 800);
+                // Respuesta exitosa
+                Swal.fire({
+                    icon: "success",
+                    title: "Acción Enviada",
+                    text: `La acción '${actionType}' se procesó correctamente.`
+                });
 
             } catch (error) {
                 console.error(error);
@@ -732,6 +726,8 @@
             btn.classList.add('active-action');
         }
     </script>
+
+
 </body>
 
 </html>
