@@ -241,7 +241,7 @@
             /* Espacio entre botones */
         }
 
-        .header-actions button {
+        .header-actions button:not(.atelier-btn) {
             width: auto;
             /* Botones no ocupan todo el ancho */
             padding: 10px 20px;
@@ -968,7 +968,8 @@
             </div>
             <div class="header-actions">
                 <button onclick="panel.toggleTheme()" aria-label="Cambiar tema">🌞 / 🌙</button>
-                <button onclick="panel.logout()" aria-label="Cerrar sesión">Salir</button>
+                <button onclick="panel.logout()" class="atelier-btn atelier-btn-secondary" style="flex: none;"
+                    aria-label="Cerrar sesión">Salir</button>
             </div>
         </header>
 
@@ -1070,13 +1071,191 @@
     <!-- CORE LOGIC MODULE -->
     <script>
         /**
-         * 🧠 Atelier Engine - Core Panel Logic
-         * Arquitectura Modular para Gestión Escalable
+         * 🎨 Atelier Engine - Advanced Panel Logic
+         * Apple-Style Modal System + Enterprise Features
          */
+
+        // ==========================================
+        // 🪟 CUSTOM MODAL SYSTEM
+        // ==========================================
+
+        class AtelierModal {
+            constructor() {
+                this.overlay = null;
+                this.currentModal = null;
+                this.keyboardHandler = this.handleKeyboard.bind(this);
+            }
+
+            create(config) {
+                // Create overlay
+                this.overlay = document.createElement('div');
+                this.overlay.className = 'atelier-modal-overlay';
+
+                // Create modal
+                const modal = document.createElement('div');
+                modal.className = `atelier-modal ${config.type || ''}`;
+
+                // Build content
+                modal.innerHTML = `
+                    <div class="atelier-modal-header">
+                        ${config.icon ? `<span class="atelier-modal-icon">${config.icon}</span>` : ''}
+                        <h3 class="atelier-modal-title">${config.title}</h3>
+                        ${config.subtitle ? `<p class="atelier-modal-subtitle">${config.subtitle}</p>` : ''}
+                    </div>
+                    <div class="atelier-modal-body">
+                        ${config.content || ''}
+                    </div>
+                    ${config.actions ? `
+                        <div class="atelier-modal-actions">
+                            ${config.actions}
+                        </div>
+                    ` : ''}
+                `;
+
+                this.overlay.appendChild(modal);
+                document.body.appendChild(this.overlay);
+                this.currentModal = modal;
+
+                // Activate with animation
+                requestAnimationFrame(() => {
+                    this.overlay.classList.add('active');
+                });
+
+                // Keyboard support
+                document.addEventListener('keydown', this.keyboardHandler);
+
+                return modal;
+            }
+
+            close() {
+                if (!this.overlay) return;
+
+                this.overlay.classList.remove('active');
+                document.removeEventListener('keydown', this.keyboardHandler);
+
+                setTimeout(() => {
+                    if (this.overlay && this.overlay.parentNode) {
+                        this.overlay.parentNode.removeChild(this.overlay);
+                    }
+                    this.overlay = null;
+                    this.currentModal = null;
+                }, 300);
+            }
+
+            handleKeyboard(e) {
+                if (e.key === 'Escape') {
+                    this.close();
+                }
+            }
+
+            showLoading(title = 'Procesando...', subtitle = 'Por favor espera') {
+                return this.create({
+                    icon: '<div class="atelier-loading"></div>',
+                    title,
+                    subtitle
+                });
+            }
+
+            showSuccess(title, message) {
+                return this.create({
+                    type: 'success',
+                    icon: '✅',
+                    title,
+                    subtitle: message,
+                    actions: `
+                        <button class="atelier-btn atelier-btn-primary" onclick="modal.close()">
+                            Entendido
+                        </button>
+                    `
+                });
+            }
+
+            showError(title, message) {
+                return this.create({
+                    type: 'error',
+                    icon: '❌',
+                    title,
+                    subtitle: message,
+                    actions: `
+                        <button class="atelier-btn atelier-btn-secondary" onclick="modal.close()">
+                            Cerrar
+                        </button>
+                    `
+                });
+            }
+
+            showWarning(title, message, onConfirm) {
+                const modal = this.create({
+                    type: 'warning',
+                    icon: '⚠️',
+                    title,
+                    subtitle: message,
+                    actions: `
+                        <button class="atelier-btn atelier-btn-secondary" onclick="modal.close()">
+                            Cancelar
+                        </button>
+                        <button class="atelier-btn atelier-btn-primary" id="confirm-btn">
+                            Confirmar
+                        </button>
+                    `
+                });
+
+                document.getElementById('confirm-btn').onclick = () => {
+                    this.close();
+                    if (onConfirm) onConfirm();
+                };
+
+                return modal;
+            }
+        }
+
+        // Global modal instance
+        const modal = new AtelierModal();
+
+        // ==========================================
+        // 📊 METRICS TRACKER
+        // ==========================================
+
+        class MetricsTracker {
+            constructor() {
+                this.metrics = JSON.parse(localStorage.getItem('atelier_metrics')) || {
+                    postsGenerated: 0,
+                    postsScheduled: 0,
+                    imagesProcessed: 0,
+                    workflowTests: 0,
+                    diagnosticsRun: 0,
+                    errors: 0,
+                    totalActions: 0,
+                    lastAction: null
+                };
+            }
+
+            increment(key) {
+                this.metrics[key] = (this.metrics[key] || 0) + 1;
+                this.metrics.totalActions++;
+                this.metrics.lastAction = new Date().toISOString();
+                this.save();
+            }
+
+            get(key) {
+                return this.metrics[key] || 0;
+            }
+
+            save() {
+                localStorage.setItem('atelier_metrics', JSON.stringify(this.metrics));
+            }
+
+            getAll() {
+                return this.metrics;
+            }
+        }
+
+        // ==========================================
+        // 🧠 MAIN PANEL CLASS
+        // ==========================================
 
         class AtelierPanel {
             constructor() {
-                // CONFIGURACIÓN CENTRAL
                 this.config = {
                     webhookUrl: "https://n8n.aureliocontrerasatelier.com/webhook/panel-action",
                     headers: {
@@ -1085,8 +1264,10 @@
                 };
 
                 this.user = JSON.parse(sessionStorage.getItem('atelier_session'))?.username || null;
+                this.metrics = new MetricsTracker();
+                this.logs = [];
 
-                // MÓDULOS DEL SISTEMA
+                // Initialize modules
                 this.modules = {
                     content: new ContentModule(this),
                     system: new SystemModule(this),
@@ -1098,7 +1279,6 @@
             }
 
             init() {
-                // Cargar sesión
                 if (this.user) {
                     this.showDashboard(this.user);
                 }
@@ -1110,37 +1290,27 @@
                 const u = document.getElementById("username").value.trim();
                 const p = document.getElementById("password").value.trim();
 
-                // TODO: En producción validar contra endpoint real
                 if (u === "econtreras" && p === "Ec1330") {
                     this.user = u;
                     sessionStorage.setItem('atelier_session', JSON.stringify({ username: u }));
                     this.showDashboard(u);
-                    this.notifySuccess("Bienvenido al Motor", "Sesión iniciada correctamente");
+                    modal.showSuccess("¡Bienvenido!", "Sesión iniciada correctamente");
                 } else {
-                    this.notifyError("Credenciales inválidas", "Verifica tu usuario y contraseña");
+                    modal.showError("Acceso Denegado", "Credenciales inválidas");
                 }
             }
 
             logout() {
-                Swal.fire({
-                    title: "¿Cerrar Sesión?",
-                    text: "Se perderá el progreso no guardado",
-                    icon: "warning",
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: "Sí, salir",
-                    background: '#1e293b',
-                    color: '#fff'
-                }).then((result) => {
-                    if (result.isConfirmed) {
+                modal.showWarning(
+                    "¿Cerrar Sesión?",
+                    "Se perderá el progreso no guardado",
+                    () => {
                         sessionStorage.removeItem('atelier_session');
                         location.reload();
                     }
-                });
+                );
             }
 
-            // --- UI HELPERS ---
             showDashboard(username) {
                 document.getElementById("loginScreen").style.display = "none";
                 document.getElementById("dashboardContent").style.display = "block";
@@ -1151,7 +1321,6 @@
                 document.body.classList.toggle("light");
             }
 
-            // --- NAVIGATION ---
             showMain() {
                 document.querySelectorAll(".detail-view").forEach(v => v.classList.remove("active"));
                 document.getElementById("mainView").style.display = "block";
@@ -1167,24 +1336,18 @@
 
             // --- CORE API HANDLER ---
             async sendRequest(actionName, payload = {}) {
-                // Validación básica de seguridad
                 if (!this.user) {
-                    this.notifyError("Acceso Denegado", "Debes iniciar sesión para realizar acciones.");
+                    modal.showError("Acceso Denegado", "Debes iniciar sesión");
                     return;
                 }
 
-                // Feedback Visual: Loading
-                Swal.fire({
-                    title: 'Procesando...',
-                    text: `Ejecutando protocolo: ${actionName}`,
-                    allowOutsideClick: false,
-                    didOpen: () => Swal.showLoading(),
-                    background: '#1e293b',
-                    color: '#fff'
-                });
+                // Log the action
+                this.logAction(actionName, 'initiated', payload);
+
+                // Show loading
+                modal.showLoading('Procesando...', `Ejecutando: ${actionName}`);
 
                 try {
-                    // LLAMADA AL WEBHOOK (Según especificación del prompt)
                     const requestBody = {
                         action: actionName,
                         payload: payload,
@@ -1192,61 +1355,82 @@
                         timestamp: new Date().toISOString()
                     };
 
-                    console.log("📤 Sending Payload:", requestBody);
+                    console.log("📤 Sending:", requestBody);
 
+                    const startTime = Date.now();
                     const response = await fetch(this.config.webhookUrl, {
                         method: "POST",
                         headers: this.config.headers,
                         body: JSON.stringify(requestBody)
                     });
 
-                    // Manejo de errores HTTP
+                    const duration = ((Date.now() - startTime) / 1000).toFixed(2);
+
                     if (!response.ok) {
-                        throw new Error(`Server returned ${response.status}: ${response.statusText}`);
+                        throw new Error(`Server error: ${response.status} ${response.statusText}`);
                     }
 
                     const data = await response.json();
 
-                    // Feedback Visual: Success
-                    // Si el servidor devuelve un mensaje específico entra aquí
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Operación Exitosa',
-                        text: data.message || `La acción ${actionName} se completó correctamente.`,
-                        background: '#1e293b',
-                        color: '#fff',
-                        timer: 2000,
-                        showConfirmButton: false
-                    });
+                    // Log success
+                    this.logAction(actionName, 'success', { duration, response: data });
+
+                    // Close loading and show success
+                    modal.close();
+                    setTimeout(() => {
+                        modal.showSuccess(
+                            'Operación Exitosa',
+                            data.message || `${actionName} completado en ${duration}s`
+                        );
+                    }, 100);
 
                     return data;
 
                 } catch (error) {
-                    console.error("❌ API Error:", error);
+                    console.error("❌ Error:", error);
+                    this.metrics.increment('errors');
+                    this.logAction(actionName, 'error', { error: error.message });
 
-                    // Feedback Visual: Error
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error de Conexión',
-                        text: 'No se pudo contactar al servidor n8n. Verifica que el webhook esté activo.',
-                        background: '#1e293b',
-                        color: '#fff'
-                    });
+                    modal.close();
+                    setTimeout(() => {
+                        modal.showError(
+                            'Error de Conexión',
+                            `No se pudo contactar al servidor n8n. ${error.message}`
+                        );
+                    }, 100);
                 }
             }
 
-            // --- NOTIFICATIONS ---
-            notifySuccess(title, text) {
-                Swal.fire({ icon: 'success', title, text, timer: 1500, showConfirmButton: false, background: '#1e293b', color: '#fff' });
+            logAction(action, status, metadata = {}) {
+                const log = {
+                    timestamp: new Date().toISOString(),
+                    user: this.user,
+                    action,
+                    status,
+                    metadata
+                };
+
+                this.logs.push(log);
+
+                // Keep only last 100 logs
+                if (this.logs.length > 100) {
+                    this.logs = this.logs.slice(-100);
+                }
+
+                console.log(`[${status.toUpperCase()}]`, action, metadata);
             }
 
-            notifyError(title, text) {
-                Swal.fire({ icon: 'error', title, text, background: '#1e293b', color: '#fff' });
+            sanitize(input) {
+                if (typeof input !== 'string') return input;
+                return input
+                    .replace(/<script[^>]*>.*?<\/script>/gi, '')
+                    .replace(/<[^>]+>/g, '')
+                    .trim();
             }
         }
 
         // ==========================================
-        // 🧩 MÓDULOS INDEPENDIENTES (Modularidad)
+        // 📝 CONTENT MODULE (ADVANCED)
         // ==========================================
 
         class BaseModule {
@@ -1255,162 +1439,548 @@
             }
         }
 
-        /**
-         * Módulo de Gestión de Contenido
-         * Maneja generación, programación y fijado de posts
-         */
         class ContentModule extends BaseModule {
 
             async generatePost() {
-                const { value: formValues } = await Swal.fire({
-                    title: '🧠 Generar Contenido IA',
-                    html: `
-                        <p style="color:#aaa; font-size:14px; margin-bottom:10px;">Define los parámetros para el motor generativo</p>
-                        <input id="swal-topic" class="swal2-input" placeholder="Tema principal (ej. Diseño Minimalista)">
-                        <input id="swal-keywords" class="swal2-input" placeholder="Keywords (sep. por comas)">
-                    `,
-                    focusConfirm: false,
-                    showCancelButton: true,
-                    confirmButtonText: 'Generar',
-                    background: '#1e293b',
-                    color: '#fff',
-                    preConfirm: () => {
-                        const topic = document.getElementById('swal-topic').value;
-                        const keywords = document.getElementById('swal-keywords').value;
-                        if (!topic) Swal.showValidationMessage('El tema es obligatorio');
-                        return { topic, keywords: keywords.split(',').map(k => k.trim()) };
+                const modalContent = `
+                    <div class="atelier-form-group">
+                        <label class="atelier-form-label">Tema Principal *</label>
+                        <input type="text" id="topic" class="atelier-input" placeholder="Ej: Diseño Minimalista" required>
+                    </div>
+                    <div class="atelier-form-group">
+                        <label class="atelier-form-label">Keywords (presiona Enter para agregar)</label>
+                        <div class="atelier-tags-input" id="keywords-container">
+                            <input type="text" id="keywords-input" placeholder="Agregar keyword...">
+                        </div>
+                    </div>
+                    <div class="atelier-form-group">
+                        <label class="atelier-form-label">Tono</label>
+                        <select class="atelier-select" id="tone">
+                            <option value="professional">Profesional</option>
+                            <option value="casual">Casual</option>
+                            <option value="creative">Creativo</option>
+                        </select>
+                    </div>
+                    <div class="atelier-metrics">
+                        <div class="atelier-metric">
+                            <div class="atelier-metric-value">${this.panel.metrics.get('postsGenerated')}</div>
+                            <div class="atelier-metric-label">Posts Generados</div>
+                        </div>
+                        <div class="atelier-metric">
+                            <div class="atelier-metric-value">${this.panel.metrics.get('totalActions')}</div>
+                            <div class="atelier-metric-label">Acciones Totales</div>
+                        </div>
+                    </div>
+                `;
+
+                const modalEl = modal.create({
+                    icon: '🧠',
+                    title: 'Generar Contenido IA',
+                    subtitle: 'Define los parámetros para el motor generativo',
+                    content: modalContent,
+                    actions: `
+                        <button class="atelier-btn atelier-btn-secondary" onclick="modal.close()">Cancelar</button>
+                        <button class="atelier-btn atelier-btn-primary" id="generate-btn">Generar</button>
+                    `
+                });
+
+                // Tags input logic
+                const keywords = [];
+                const keywordsInput = document.getElementById('keywords-input');
+                const keywordsContainer = document.getElementById('keywords-container');
+
+                keywordsInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' && keywordsInput.value.trim()) {
+                        e.preventDefault();
+                        const keyword = keywordsInput.value.trim();
+                        keywords.push(keyword);
+
+                        const tag = document.createElement('span');
+                        tag.className = 'atelier-tag';
+                        tag.innerHTML = `${keyword} <span class="atelier-tag-remove" onclick="this.parentElement.remove()">×</span>`;
+                        keywordsContainer.insertBefore(tag, keywordsInput);
+                        keywordsInput.value = '';
                     }
                 });
 
-                if (formValues) {
-                    this.panel.sendRequest('generatePost', formValues);
+                // Generate button
+                document.getElementById('generate-btn').onclick = async () => {
+                    const topic = document.getElementById('topic').value.trim();
+                    const tone = document.getElementById('tone').value;
+
+                    if (!topic || topic.length < 5) {
+                        modal.showError('Validación', 'El tema debe tener al menos 5 caracteres');
+                        return;
+                    }
+
+                    if (keywords.length === 0) {
+                        modal.showWarning('Advertencia', '¿Continuar sin keywords?', async () => {
+                            await this.executeGeneration(topic, keywords, tone);
+                        });
+                    } else {
+                        await this.executeGeneration(topic, keywords, tone);
+                    }
+                };
+            }
+
+            async executeGeneration(topic, keywords, tone) {
+                modal.close();
+
+                // Check for duplicates
+                const duplicateCheck = await this.panel.sendRequest('checkDuplicates', { topic, keywords });
+
+                // Generate post
+                const result = await this.panel.sendRequest('generatePost', {
+                    topic: this.panel.sanitize(topic),
+                    keywords: keywords.map(k => this.panel.sanitize(k)),
+                    tone
+                });
+
+                if (result) {
+                    this.panel.metrics.increment('postsGenerated');
                 }
             }
 
             async schedulePost() {
-                const { value: date } = await Swal.fire({
-                    title: '📅 Programar Publicación',
-                    html: '<input type="datetime-local" id="swal-date" class="swal2-input">',
-                    confirmButtonText: 'Agendar',
-                    showCancelButton: true,
-                    background: '#1e293b',
-                    color: '#fff',
-                    preConfirm: () => {
-                        const val = document.getElementById('swal-date').value;
-                        if (!val) Swal.showValidationMessage('Selecciona una fecha válida');
-                        return val;
-                    }
+                const modalContent = `
+                    <div class="atelier-form-group">
+                        <label class="atelier-form-label">Fecha y Hora</label>
+                        <input type="datetime-local" id="schedule-date" class="atelier-input" required>
+                    </div>
+                    <div class="atelier-form-group">
+                        <label class="atelier-form-label">Post a Programar</label>
+                        <select class="atelier-select" id="post-select">
+                            <option value="">Cargando posts...</option>
+                        </select>
+                    </div>
+                    <div class="atelier-metrics">
+                        <div class="atelier-metric">
+                            <div class="atelier-metric-value">${this.panel.metrics.get('postsScheduled')}</div>
+                            <div class="atelier-metric-label">Programados</div>
+                        </div>
+                    </div>
+                `;
+
+                modal.create({
+                    icon: '📅',
+                    title: 'Programar Publicación',
+                    subtitle: 'Agenda tu contenido para publicación automática',
+                    content: modalContent,
+                    actions: `
+                        <button class="atelier-btn atelier-btn-secondary" onclick="modal.close()">Cancelar</button>
+                        <button class="atelier-btn atelier-btn-primary" id="schedule-btn">Programar</button>
+                    `
                 });
 
-                if (date) {
-                    this.panel.sendRequest('schedulePost', { scheduledTime: date });
-                }
+                // Set minimum date to now + 5 minutes
+                const now = new Date();
+                now.setMinutes(now.getMinutes() + 5);
+                document.getElementById('schedule-date').min = now.toISOString().slice(0, 16);
+
+                // Fetch posts for dropdown
+                this.panel.sendRequest('getRecentPosts', { limit: 10 }).then(data => {
+                    const select = document.getElementById('post-select');
+                    if (data && data.data && Array.isArray(data.data)) {
+                        select.innerHTML = '<option value="">Selecciona un post...</option>';
+                        data.data.forEach(post => {
+                            const option = document.createElement('option');
+                            option.value = post.id || post.topic;
+                            option.textContent = post.topic || 'Sin Título';
+                            select.appendChild(option);
+                        });
+                    } else {
+                        select.innerHTML = '<option value="">No hay posts disponibles</option>';
+                    }
+                }).catch(() => {
+                    const el = document.getElementById('post-select');
+                    if(el) el.innerHTML = '<option value="">Error al cargar</option>';
+                });
+
+                document.getElementById('schedule-btn').onclick = async () => {
+                    const scheduledTime = document.getElementById('schedule-date').value;
+                    const postId = document.getElementById('post-select').value;
+
+                    if (!scheduledTime || !postId) {
+                        modal.showError('Validación', 'Completa todos los campos');
+                        return;
+                    }
+
+                    modal.close();
+                    
+                    // Check conflicts
+                    await this.panel.sendRequest('checkScheduleConflicts', { scheduledTime });
+                    
+                    // Schedule
+                    const result = await this.panel.sendRequest('schedulePost', { postId, scheduledTime });
+                    
+                    if (result) {
+                        this.panel.metrics.increment('postsScheduled');
+                    }
+                };
             }
 
             async generateFromImage() {
-                const { value: file } = await Swal.fire({
-                    title: '🧬 Post desde Imagen',
-                    input: 'file',
-                    inputAttributes: {
-                        'accept': 'image/*',
-                        'aria-label': 'Sube tu imagen para analizar'
-                    },
-                    text: 'La IA analizará la imagen y creará el copy perfecto',
-                    background: '#1e293b',
-                    color: '#fff',
-                    showCancelButton: true
+                const modalContent = `
+                    <div class="atelier-file-upload" id="file-upload">
+                        <div style="font-size: 48px; margin-bottom: 12px;">📸</div>
+                        <p style="color: var(--text); font-weight: 600; margin-bottom: 8px;">
+                            Arrastra una imagen o haz clic para seleccionar
+                        </p>
+                        <p style="color: var(--text-muted); font-size: 13px;">
+                            JPG, PNG, WEBP • Máx 5MB
+                        </p>
+                        <input type="file" id="file-input" accept="image/*" style="display: none;">
+                    </div>
+                    <div id="preview-container"></div>
+                    <div class="atelier-metrics">
+                        <div class="atelier-metric">
+                            <div class="atelier-metric-value">${this.panel.metrics.get('imagesProcessed')}</div>
+                            <div class="atelier-metric-label">Imágenes Procesadas</div>
+                        </div>
+                    </div>
+                `;
+
+                modal.create({
+                    icon: '🧬',
+                    title: 'Post desde Imagen',
+                    subtitle: 'La IA analizará la imagen y creará el copy perfecto',
+                    content: modalContent,
+                    actions: `
+                        <button class="atelier-btn atelier-btn-secondary" onclick="modal.close()">Cancelar</button>
+                        <button class="atelier-btn atelier-btn-primary" id="process-btn" disabled>Procesar</button>
+                    `
                 });
 
-                if (file) {
+                let selectedFile = null;
+                const fileUpload = document.getElementById('file-upload');
+                const fileInput = document.getElementById('file-input');
+                const processBtn = document.getElementById('process-btn');
+                const previewContainer = document.getElementById('preview-container');
+
+                // Click to upload
+                fileUpload.onclick = () => fileInput.click();
+
+                // Drag & drop
+                fileUpload.ondragover = (e) => {
+                    e.preventDefault();
+                    fileUpload.classList.add('dragover');
+                };
+
+                fileUpload.ondragleave = () => {
+                    fileUpload.classList.remove('dragover');
+                };
+
+                fileUpload.ondrop = (e) => {
+                    e.preventDefault();
+                    fileUpload.classList.remove('dragover');
+                    if (e.dataTransfer.files.length) {
+                        handleFile(e.dataTransfer.files[0]);
+                    }
+                };
+
+                fileInput.onchange = (e) => {
+                    if (e.target.files.length) {
+                        handleFile(e.target.files[0]);
+                    }
+                };
+
+                const handleFile = (file) => {
+                    if (!file.type.startsWith('image/')) {
+                        modal.showError('Error', 'Solo se permiten imágenes');
+                        return;
+                    }
+
+                    if (file.size > 5 * 1024 * 1024) {
+                        modal.showError('Error', 'La imagen no debe superar 5MB');
+                        return;
+                    }
+
+                    selectedFile = file;
+                    processBtn.disabled = false;
+
+                    // Show preview
                     const reader = new FileReader();
                     reader.onload = (e) => {
-                        this.panel.sendRequest('generateFromImage', {
-                            imageName: file.name,
-                            imageBase64: e.target.result // Send Base64 directly
-                        });
+                        previewContainer.innerHTML = `
+                            <div class="atelier-file-preview">
+                                <img src="${e.target.result}" alt="Preview">
+                            </div>
+                        `;
                     };
                     reader.readAsDataURL(file);
-                }
+                };
+
+                processBtn.onclick = async () => {
+                    if (!selectedFile) return;
+
+                    const reader = new FileReader();
+                    reader.onload = async (e) => {
+                        modal.close();
+
+                        const result = await this.panel.sendRequest('generateFromImage', {
+                            imageName: selectedFile.name,
+                            imageBase64: e.target.result,
+                            size: selectedFile.size
+                        });
+
+                        if (result) {
+                            this.panel.metrics.increment('imagesProcessed');
+                        }
+                    };
+                    reader.readAsDataURL(selectedFile);
+                };
             }
 
             async pinPost() {
-                const { value: postId } = await Swal.fire({
-                    title: '🧷 Fijar Publicación',
-                    input: 'text',
-                    inputLabel: 'ID o Título del Post',
-                    inputPlaceholder: 'Ej. post_12345',
-                    showCancelButton: true,
-                    background: '#1e293b',
-                    color: '#fff'
+                modal.create({
+                    icon: '🧷',
+                    title: 'Fijar Publicación',
+                    subtitle: 'Marca un post como destacado en el feed',
+                    content: `
+                        <div class="atelier-form-group">
+                            <label class="atelier-form-label">Selecciona el Post a Fijar</label>
+                            <ul class="atelier-list" id="posts-list" style="max-height:300px;overflow-y:auto;">
+                                <li class="atelier-list-item">
+                                    <div class="atelier-list-item-title">Cargando posts...</div>
+                                </li>
+                            </ul>
+                        </div>
+                    `,
+                    actions: `<button class="atelier-btn atelier-btn-secondary" onclick="modal.close()">Cancelar</button>`
                 });
 
-                if (postId) {
-                    this.panel.sendRequest('pinPost', { reference: postId });
+                this.panel.sendRequest('getRecentPosts', { limit: 10 }).then(data => {
+                    const list = document.getElementById('posts-list');
+                    if (data && data.data && data.data.length > 0) {
+                        list.innerHTML = data.data.map(p => `
+                            <li class="atelier-list-item">
+                                <div>
+                                    <div class="atelier-list-item-title">${p.topic || 'Sin título'}</div>
+                                    <div class="atelier-list-item-meta">${new Date(p.timestamp || Date.now()).toLocaleDateString()}</div>
+                                </div>
+                                <button class="atelier-btn atelier-btn-primary" 
+                                    style="padding:4px 12px;font-size:12px;"
+                                    onclick="panel.modules.content.executePin('${p.id}')">
+                                    Fijar
+                                </button>
+                            </li>
+                        `).join('');
+                    } else {
+                        list.innerHTML = '<li class="atelier-list-item"><div>No hay posts recientes</div></li>';
+                    }
+                }).catch(() => {
+                    const l = document.getElementById('posts-list');
+                    if(l) l.innerHTML = '<li class="atelier-list-item"><div style="color:var(--danger)">Error cargando posts</div></li>';
+                });
+            }
+
+            async executePin(postId) {
+                modal.close();
+                await this.panel.sendRequest('pinPost', { reference: postId });
+            }
+        }
+
+        // ==========================================
+        // ⚙️ SYSTEM MODULE
+        // ==========================================
+
+        class SystemModule extends BaseModule {
+
+            async testWorkflow() {
+                modal.showLoading('Ejecutando Test...', 'Probando workflow en n8n');
+
+                const result = await this.panel.sendRequest('testWorkflow', { mode: 'dry-run' });
+
+                if (result) {
+                    this.panel.metrics.increment('workflowTests');
+                }
+            }
+
+            async runDiagnostics() {
+                const modalContent = `
+                    <div class="atelier-progress">
+                        <div class="atelier-progress-bar" id="diag-progress" style="width: 0%"></div>
+                    </div>
+                    <ul class="atelier-list" id="diagnostics-list">
+                        <li class="atelier-list-item">
+                            <div>
+                                <div class="atelier-list-item-title">Iniciando diagnóstico...</div>
+                            </div>
+                        </li>
+                    </ul>
+                `;
+
+                modal.create({
+                    icon: '🧰',
+                    title: 'Diagnóstico del Sistema',
+                    subtitle: 'Verificando estado de servicios',
+                    content: modalContent
+                });
+
+                // Simulate progress
+                let progress = 0;
+                const progressBar = document.getElementById('diag-progress');
+                const interval = setInterval(() => {
+                    progress += 10;
+                    progressBar.style.width = progress + '%';
+                    if (progress >= 100) clearInterval(interval);
+                }, 200);
+
+                const result = await this.panel.sendRequest('systemDiagnostic', { components: ['all'] });
+
+                if (result) {
+                    this.panel.metrics.increment('diagnosticsRun');
+                }
+            }
+
+            async cleanQueue() {
+                const modalContent = `
+                    <div class="atelier-form-group">
+                        <label class="atelier-form-label">Opciones de Limpieza</label>
+                        <div style="display: flex; flex-direction: column; gap: 12px;">
+                            <label style="display: flex; align-items: center; gap: 8px; color: var(--text);">
+                                <input type="checkbox" id="clean-duplicates" checked> Eliminar duplicadas
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; color: var(--text);">
+                                <input type="checkbox" id="clean-obsolete" checked> Eliminar obsoletas
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; color: var(--text);">
+                                <input type="checkbox" id="clean-failed"> Reintentar fallidas
+                            </label>
+                        </div>
+                    </div>
+                `;
+
+                modal.create({
+                    icon: '🧼',
+                    title: 'Limpiar Cola',
+                    subtitle: 'Optimiza la cola de publicaciones',
+                    content: modalContent,
+                    actions: `
+                        <button class="atelier-btn atelier-btn-secondary" onclick="modal.close()">Cancelar</button>
+                        <button class="atelier-btn atelier-btn-primary" id="clean-btn">Limpiar</button>
+                    `
+                });
+
+                document.getElementById('clean-btn').onclick = async () => {
+                    const options = {
+                        duplicates: document.getElementById('clean-duplicates').checked,
+                        obsolete: document.getElementById('clean-obsolete').checked,
+                        failed: document.getElementById('clean-failed').checked
+                    };
+
+                    modal.close();
+                    await this.panel.sendRequest('cleanQueue', options);
+                };
+            }
+
+            async listPanels() {
+                modal.showLoading('Cargando Paneles...', 'Obteniendo lista de paneles activos');
+                try {
+                    const response = await this.panel.sendRequest('listActivePanels');
+                    modal.close();
+                    
+                    const panels = (response && response.data) ? response.data : [];
+                    
+                    const content = panels.length ? panels.map(p => `
+                        <li class="atelier-list-item">
+                            <div>
+                                <div class="atelier-list-item-title">${p.name || 'Panel Desconocido'}</div>
+                                <div class="atelier-list-item-meta">${p.status || 'Activo'} • ${p.lastActive || 'N/A'}</div>
+                            </div>
+                            <div class="atelier-list-item-actions">
+                                <button class="atelier-icon-btn" title="Abrir" onclick="window.open('${p.url}', '_blank')">🔗</button>
+                            </div>
+                        </li>
+                    `).join('') : '<li class="atelier-list-item"><div>No hay paneles activos encontrados</div></li>';
+
+                    modal.create({
+                        icon: '🧭',
+                        title: 'Paneles Activos',
+                        subtitle: 'Gestiona tus paneles conectados',
+                        content: `<ul class="atelier-list">${content}</ul>`,
+                        actions: `<button class="atelier-btn atelier-btn-primary" onclick="modal.close()">Cerrar</button>`
+                    });
+
+                } catch(e) {
+                     modal.close();
+                     modal.showError('Error', 'No se pudieron cargar los paneles');
                 }
             }
         }
 
-        /**
-         * Módulo de Sistema
-         * Operaciones técnicas y mantenimiento
-         */
-        class SystemModule extends BaseModule {
-            testWorkflow() {
-                this.panel.sendRequest('testWorkflow', { mode: 'dry-run' }); // Petición simple
-            }
+        // ==========================================
+        // 🔍 AUDIT MODULE
+        // ==========================================
 
-            runDiagnostics() {
-                this.panel.sendRequest('systemDiagnostic', { components: ['all'] });
-            }
-
-            cleanQueue() {
-                this.panel.sendRequest('cleanQueue', { force: true });
-            }
-
-            async listPanels() {
-                // Simulamos una navegación interna o petición de lista
-                this.panel.sendRequest('listActivePanels').then(data => {
-                    // Si recibimos datos, podríamos mostrarlos. Por ahora mostramos éxito.
-                    // En una implementación real, aquí actualizaríamos el DOM con la lista recibida.
-                });
-            }
-        }
-
-        /**
-         * Módulo de Auditoría
-         * Logs y Análisis
-         */
         class AuditModule extends BaseModule {
-            viewLogs() {
-                this.panel.sendRequest('getSystemLogs', { limit: 50 });
+
+            async viewLogs() {
+                modal.showLoading('Cargando Logs...', 'Obteniendo historial del sistema');
+                try {
+                    const response = await this.panel.sendRequest('getSystemLogs', { limit: 20 });
+                    modal.close();
+                    
+                    const logs = (response && response.data) ? response.data : this.panel.logs.slice(-20).reverse();
+                    
+                    const logsHtml = logs.map(log => `
+                        <li class="atelier-list-item">
+                            <div>
+                                <div class="atelier-list-item-title">${log.action}</div>
+                                <div class="atelier-list-item-meta">
+                                    ${new Date(log.timestamp).toLocaleString()} • ${log.user || 'System'}
+                                </div>
+                            </div>
+                            <span class="atelier-badge ${log.status}">${log.status}</span>
+                        </li>
+                    `).join('');
+
+                    modal.create({
+                        icon: '📋',
+                        title: 'Registros del Sistema',
+                        subtitle: `Últimas ${logs.length} acciones`,
+                        content: `<ul class="atelier-list" style="max-height:400px;overflow-y:auto;">${logsHtml || '<p style="text-align:center;">No hay registros</p>'}</ul>`,
+                        actions: `
+                            <button class="atelier-btn atelier-btn-secondary" onclick="modal.close()">Cerrar</button>
+                            <button class="atelier-btn atelier-btn-primary" onclick="panel.modules.audit.exportHistory()">Exportar</button>
+                        `
+                    });
+                } catch(e) {
+                    modal.close();
+                    modal.showError('Error', 'Fallo al recuperar logs');
+                }
             }
 
-            auditContent() {
-                this.panel.sendRequest('auditContentQuality');
+            async auditContent() {
+                await this.panel.sendRequest('auditContentQuality');
             }
 
-            exportHistory() {
-                this.panel.sendRequest('exportCsvMetrics');
-            }
-        }
-
-        /**
-         * Módulo de IA
-         * Reentrenamiento y ajustes
-         */
-        class AIModule extends BaseModule {
-            retrain() {
-                this.panel.sendRequest('triggerRetrain', { dataset: 'latest' });
+            async exportHistory() {
+                modal.close();
+                await this.panel.sendRequest('exportCsvMetrics');
             }
         }
 
         // ==========================================
-        // 🚀 INICIALIZACIÓN
+        // 🤖 AI MODULE
+        // ==========================================
+
+        class AIModule extends BaseModule {
+            async retrain() {
+                modal.showWarning(
+                    'Reentrenar IA',
+                    'Este proceso puede tomar varios minutos. ¿Continuar?',
+                    async () => {
+                        await this.panel.sendRequest('triggerRetrain', { dataset: 'latest' });
+                    }
+                );
+            }
+        }
+
+        // ==========================================
+        // 🚀 INITIALIZATION
         // ==========================================
         const panel = new AtelierPanel();
-
-        // Exponer funciones globales para el HTML si es necesario (legacy support)
-        // Aunque ahora usamos panel.modules.xyz en los onclicks
         window.panel = panel;
 
     </script>
