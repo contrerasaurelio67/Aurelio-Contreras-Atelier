@@ -1,0 +1,27 @@
+# Guía rápida de despliegue automático con cron
+
+1. Edita tu archivo index.html en tu PC normalmente.
+   - Carpeta local: C:\Users\arcom\Panel-n8n\index.html
+
+2. Sube el archivo a tu VM con este comando en PowerShell:
+   scp -i $HOME\.ssh\google_compute_engine "C:\Users\arcom\Panel-n8n\index.html" contrerasaurelio67@34.148.6.253:/home/contrerasaurelio67/
+
+3. El script deploy.sh en la VM se encarga de:
+   - Detectar si hay cambios en index.html.
+   - Actualizar automáticamente en /var/www/site/index.html.
+   - Ajustar permisos correctos para Nginx.
+
+4. Cron está configurado para ejecutar deploy.sh cada 30 minutos:
+   */30 * * * * /home/contrerasaurelio67/deploy.sh >> /home/contrerasaurelio67/deploy.log 2>&1
+
+5. Resultado:
+   - Si hay cambios → se despliega automáticamente.
+   - Si no hay cambios → no hace nada.
+
+6. Para verificar:
+   tail -n 20 /home/contrerasaurelio67/deploy.log
+   (muestra los últimos mensajes del script)
+
+# Conclusión:
+Solo necesitas editar tu HTML local y subirlo con scp.
+El resto lo hace cron y deploy.sh automáticamente.

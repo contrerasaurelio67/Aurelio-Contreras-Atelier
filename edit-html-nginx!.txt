@@ -1,4 +1,0 @@
-sudo nano /var/www/site/index.html
-sudo nano /etc/nginx/sites-available/default
-
-sudo systemctl reload nginx

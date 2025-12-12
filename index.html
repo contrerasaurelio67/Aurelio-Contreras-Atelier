@@ -4,735 +4,454 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Atelier Engine – Panel Administrativo</title>
-    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <title>Panel de Control Atelier</title>
+    <meta name="description" content="Panel administrativo para gestión de publicaciones y sistema.">
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Custom Modal System (Apple-Style) -->
-
-    <!-- Estilos del Panel -->
     <style>
-        /* ──────────────────────────────── */
-        /*            VARIABLES              */
-        /* ──────────────────────────────── */
+        /* 
+         * =========================================
+         * 1. DESIGN SYSTEM & VARIABLES
+         * =========================================
+         */
         :root {
-            --primary: #6366f1;
-            --primary-dark: #4f46e5;
-            --secondary: #8b5cf6;
-            --success: #10b981;
-            --danger: #ef4444;
-            --warning: #f59e0b;
+            --color-bg-light: #F5F5F7;
+            --color-surface-light: #FFFFFF;
+            --color-text-primary-light: #1D1D1F;
+            --color-text-secondary-light: #86868B;
+            --color-border-light: #D2D2D7;
 
-            --dark: #0f172a;
-            --dark-light: #1e293b;
-            --dark-lighter: #334155;
+            --color-bg-dark: #000000;
+            --color-surface-dark: #1C1C1E;
+            --color-text-primary-dark: #F5F5F7;
+            --color-text-secondary-dark: #86868B;
+            --color-border-dark: #38383A;
 
-            --text: #f1f5f9;
-            --text-muted: #94a3b8;
-            --border: #475569;
-            --shadow: rgba(0, 0, 0, 0.28);
+            --color-accent: #0071E3;
+            --color-accent-hover: #0077ED;
+            --color-danger: #FF3B30;
+            --color-success: #34C759;
+            --color-warning: #FF9500;
 
-            /* Theme specific vars */
-            --bg-gradient-start: var(--dark);
-            --bg-gradient-end: #1a1f35;
-            --card-bg: rgba(30, 41, 59, 0.8);
-            --card-border: rgba(255, 255, 255, 0.1);
-            --action-btn-bg: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(51, 65, 85, 0.7));
-            --action-btn-hover: linear-gradient(135deg, rgba(40, 51, 75, 0.95), rgba(60, 75, 100, 0.8));
-            --input-border: rgba(255, 255, 255, 0.1);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 18px;
+            --radius-xl: 24px;
+
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+            --shadow-hover: 0 14px 24px -6px rgba(0, 0, 0, 0.12);
+
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --transition-fast: 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+            --transition-smooth: 0.4s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
-        body.light {
-            --dark: #ffffff;
-            --dark-light: #f8fafc;
-            --dark-lighter: #e2e8f0;
-
-            --text: #1e293b;
-            --text-muted: #6b7280;
-            --border: #cbd5e1;
-            --shadow: rgba(0, 0, 0, 0.08);
-
-            /* Light theme specific vars */
-            --bg-gradient-start: #f8fafc;
-            --bg-gradient-end: #e2e8f0;
-            --card-bg: rgba(255, 255, 255, 0.85);
-            --card-border: rgba(0, 0, 0, 0.06);
-            --action-btn-bg: linear-gradient(135deg, #ffffff, #f1f5f9);
-            --action-btn-hover: linear-gradient(135deg, #ffffff, #e2e8f0);
-            --input-border: #cbd5e1;
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-body: var(--color-bg-dark);
+                --bg-card: var(--color-surface-dark);
+                --text-primary: var(--color-text-primary-dark);
+                --text-secondary: var(--color-text-secondary-dark);
+                --border-color: var(--color-border-dark);
+                --shadow-color: rgba(0, 0, 0, 0.5);
+            }
         }
 
-        /* RESET */
+        @media (prefers-color-scheme: light) {
+            :root {
+                --bg-body: var(--color-bg-light);
+                --bg-card: var(--color-surface-light);
+                --text-primary: var(--color-text-primary-light);
+                --text-secondary: var(--color-text-secondary-light);
+                --border-color: var(--color-border-light);
+                --shadow-color: rgba(0, 0, 0, 0.05);
+            }
+        }
+
         * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
         }
 
         body {
-            font-family: 'Inter', system-ui, sans-serif;
-            background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
-            color: var(--text);
-            min-height: 100vh;
-            overflow-x: hidden;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        /* ──────────────────────────────── */
-        /*        LOGIN SCREEN (GLASS)       */
-        /* ──────────────────────────────── */
-        #loginScreen {
+            font-family: var(--font-family);
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            transition: background-color 0.3s ease, color 0.3s ease;
             display: flex;
             justify-content: center;
-            align-items: center;
             min-height: 100vh;
-            padding: 24px;
-            animation: fadeIn 0.6s ease-out;
+            padding: 2rem;
         }
 
-        .login-card {
-            background: var(--card-bg);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--card-border);
-            padding: 40px;
-            border-radius: 24px;
-            width: 100%;
-            max-width: 420px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1),
-                0 0 0 1px var(--card-border) inset;
-            animation: slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .logo-title {
-            text-align: center;
-            margin-bottom: 32px;
-        }
-
-        .logo-title h1 {
-            font-size: 28px;
-            background: linear-gradient(135deg, #fff, #94a3b8);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            margin-bottom: 8px;
-            letter-spacing: -0.5px;
-        }
-
-        body.light .logo-title h1 {
-            background: linear-gradient(135deg, #1e293b, #475569);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-
-        .logo-title p {
-            color: var(--text-muted);
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        /* INPUTS */
-        input {
-            width: 100%;
-            padding: 12px 14px;
-            background: var(--dark);
-            border: 1px solid var(--input-border);
-            border-radius: 10px;
-            margin-bottom: 20px;
-            color: var(--text);
-            font-size: 15px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        input:hover {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-        }
-
-        input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
-            transform: translateY(-1px);
-        }
-
-        /* BOTONES GENÉRICOS */
-        button {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+        button,
+        input,
+        select,
+        textarea {
+            font-family: inherit;
             border: none;
-            padding: 14px;
+            outline: none;
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+
+        .container {
             width: 100%;
-            border-radius: 12px;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 16px;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        button::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.3);
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
-        }
-
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
-        }
-
-        button:active::before {
-            width: 300px;
-            height: 300px;
-            transition: width 0s, height 0s;
-        }
-
-        button:active {
-            transform: translateY(0);
-        }
-
-        /* ──────────────────────────────── */
-        /*          DASHBOARD LAYOUT         */
-        /* ──────────────────────────────── */
-        #dashboardContent {
-            display: none;
             max-width: 1200px;
-            margin: 0 auto;
-            padding: 30px 20px;
-            padding-bottom: 80px;
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 2rem;
+            align-items: start;
         }
 
-        /* HEADER */
-        header {
-            background: var(--card-bg);
-            backdrop-filter: blur(16px);
-            border: 1px solid var(--card-border);
-            padding: 18px 24px;
-            border-radius: 16px;
-            margin-bottom: 30px;
+        @media (max-width: 900px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Header & Status */
+        .main-panel header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
-            animation: slideDown 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-bottom: 2rem;
         }
 
-        header h2 {
-            font-size: 20px;
-            margin-bottom: 4px;
-        }
-
-        header p {
-            color: var(--text-muted);
-            font-size: 14px;
-        }
-
-        .header-actions {
+        .header-badges {
             display: flex;
-            gap: 12px;
-            /* Espacio entre botones */
+            gap: 0.75rem;
+            align-items: center;
         }
 
-        .header-actions button:not(.atelier-btn) {
-            width: auto;
-            /* Botones no ocupan todo el ancho */
-            padding: 10px 20px;
-            font-size: 14px;
-            background: var(--dark-lighter);
-            border: 1px solid var(--card-border);
-            box-shadow: none;
-            color: var(--text);
-        }
-
-        /* Specific fix for header buttons text color interaction */
-        body.light .header-actions button {
-            color: white;
-            /* Keep white text for buttons if they are distinct */
-            /* Or if we want them to be light colored in light mode? */
-            /* Current var(--dark-lighter) is #e2e8f0 (light grey) in light mode */
-            background: var(--dark-lighter);
-            color: var(--text-muted);
-        }
-
-        /* Better approach for header buttons: keep them themed */
-        .header-actions button {
-            background: var(--dark-lighter);
-            color: var(--text);
-        }
-
-        body.light .header-actions button {
-            background: #e2e8f0;
-            color: #475569;
-        }
-
-        .header-actions button:hover {
-            background: var(--primary);
-            border-color: var(--primary);
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
-            color: white !important;
-        }
-
-        /* SECTION HEADERS */
-        .section {
-            margin-bottom: 40px;
-            animation: fadeInUp 0.6s ease-out backwards;
-        }
-
-        .section h3 {
-            font-size: 18px;
-            margin-bottom: 20px;
+        .status-badge {
+            font-size: 0.85rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 99px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
             display: flex;
             align-items: center;
-            gap: 10px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            font-weight: 600;
+            gap: 0.5rem;
+            font-weight: 500;
         }
 
-        .section h3::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: linear-gradient(90deg, var(--border), transparent);
-            margin-left: 10px;
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--color-text-secondary);
         }
 
-        /* ACTION BUTTONS (CARDS) */
-        .button-grid {
+        .status-dot.online {
+            background: var(--color-success);
+            box-shadow: 0 0 8px var(--color-success);
+        }
+
+        .status-dot.offline {
+            background: var(--text-secondary);
+        }
+
+        .version-badge {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            opacity: 0.7;
+        }
+
+        /* Cards Grid */
+        .grid {
             display: grid;
-            gap: 20px;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 1.5rem;
         }
 
-        .action-button {
-            background: var(--action-btn-bg);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--card-border);
-            border-radius: 16px;
-            padding: 24px;
+        .card {
+            background: var(--bg-card);
+            padding: 1.5rem;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
             cursor: pointer;
+            transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+            border: 1px solid transparent;
             position: relative;
             overflow: hidden;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
+            text-align: left;
         }
 
-        .action-button h4 {
-            font-size: 17px;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--text);
+        .card:hover {
+            transform: scale(1.02);
+            box-shadow: var(--shadow-hover);
+            border-color: var(--border-color);
         }
 
-        .action-button p {
-            font-size: 13px;
-            color: var(--text-muted);
-            line-height: 1.5;
+        .card:focus-visible {
+            outline: 2px solid var(--color-accent);
+            outline-offset: 4px;
         }
 
-        .action-button:hover {
-            transform: translateY(-6px) scale(1.02);
-            box-shadow: 0 12px 28px rgba(99, 102, 241, 0.15),
-                0 0 0 1px rgba(99, 102, 241, 0.2) inset;
-            border-color: rgba(99, 102, 241, 0.3);
-            background: var(--action-btn-hover);
+        .card.disabled {
+            opacity: 0.5;
+            pointer-events: none;
+            filter: grayscale(1);
         }
 
-        /* ANIMATIONS */
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-
-            to {
-                opacity: 1;
-            }
-        }
-
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(40px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .section:nth-child(1) {
-            animation-delay: 0.1s;
-        }
-
-        .section:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-
-        .section:nth-child(3) {
-            animation-delay: 0.3s;
-        }
-
-        .section:nth-child(4) {
-            animation-delay: 0.4s;
-        }
-
-        /* VIEWS & STATES */
-        .detail-view {
-            display: none;
-            animation: fadeIn 0.4s ease-out;
-        }
-
-        .detail-view.active {
+        .card-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
             display: block;
         }
 
-        .detail-view h2 {
-            margin-top: 20px;
-            margin-bottom: 20px;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 10px;
+        .card-title {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
         }
 
-        /* FOOTER */
-        footer {
-            background: rgba(30, 41, 59, 0.6);
-            backdrop-filter: blur(12px);
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 24px;
+        .card-desc {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .panel-box {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .panel-box h3 {
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            letter-spacing: 0.05em;
+        }
+
+        .preview-content {
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             text-align: center;
-            margin-top: 60px;
-            animation: fadeIn 1s ease-out 0.5s backwards;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            border: 2px dashed var(--border-color);
+            border-radius: var(--radius-md);
+            margin-top: 0.5rem;
+            padding: 1rem;
+            word-break: break-word;
         }
 
-        footer p {
-            margin: 0;
-            color: var(--text-muted);
-            font-size: 14px;
+        .preview-content.has-data {
+            display: block;
+            text-align: left;
+            border: none;
+            background: var(--bg-body);
+            color: var(--text-primary);
         }
 
-        footer a {
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: 600;
+        .history-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
         }
 
-        body.light footer {
-            background: rgba(255, 255, 255, 0.8);
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.9rem;
         }
 
-        /* RESPONSIVE */
-        @media (max-width: 768px) {
-            header {
-                flex-direction: column;
-                gap: 16px;
-                align-items: stretch;
-            }
-
-            .header-actions {
-                justify-content: space-between;
-            }
-
-            .header-actions button {
-                flex: 1;
-            }
-
-            .logo-title h1 {
-                font-size: 24px;
-            }
+        .history-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
         }
 
-        /* ──────────────────────────────── */
-        /*    CUSTOM MODAL SYSTEM (APPLE)   */
-        /* ──────────────────────────────── */
+        .history-meta {
+            display: flex;
+            flex-direction: column;
+        }
 
-        /* Modal Overlay */
-        .atelier-modal-overlay {
+        .history-action {
+            font-weight: 500;
+        }
+
+        .history-time {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .history-status {
+            font-size: 1.2rem;
+        }
+
+        /* Modal */
+        .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(0, 0, 0, 0.4);
             backdrop-filter: blur(8px);
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 9999;
             opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            visibility: hidden;
+            transition: opacity var(--transition-fast), visibility var(--transition-fast);
+            z-index: 1000;
         }
 
-        .atelier-modal-overlay.active {
+        .modal-overlay.open {
             opacity: 1;
-            pointer-events: all;
+            visibility: visible;
         }
 
-        /* Modal Container */
-        .atelier-modal {
-            background: var(--card-bg);
-            backdrop-filter: blur(40px);
-            border: 1px solid var(--card-border);
-            border-radius: 24px;
-            padding: 32px;
+        .modal {
+            background: var(--bg-card);
             width: 90%;
-            max-width: 520px;
-            max-height: 85vh;
-            overflow-y: auto;
-            box-shadow:
-                0 25px 50px -12px rgba(0, 0, 0, 0.5),
-                0 0 0 1px rgba(255, 255, 255, 0.05) inset;
-            transform: scale(0.9) translateY(20px);
-            opacity: 0;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            max-width: 480px;
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            box-shadow: var(--shadow-hover);
+            transform: translateY(20px) scale(0.95);
+            transition: transform var(--transition-smooth);
+            position: relative;
         }
 
-        .atelier-modal-overlay.active .atelier-modal {
-            transform: scale(1) translateY(0);
-            opacity: 1;
+        .modal-overlay.open .modal {
+            transform: translateY(0) scale(1);
         }
 
-        /* Modal Header */
-        .atelier-modal-header {
-            margin-bottom: 24px;
-            text-align: center;
-        }
-
-        .atelier-modal-icon {
-            font-size: 48px;
-            margin-bottom: 12px;
-            display: block;
-        }
-
-        .atelier-modal-title {
-            font-size: 22px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: var(--text);
-        }
-
-        .atelier-modal-subtitle {
-            font-size: 14px;
-            color: var(--text-muted);
-            line-height: 1.5;
-        }
-
-        /* Modal Body */
-        .atelier-modal-body {
-            margin-bottom: 24px;
-        }
-
-        /* Form Elements */
-        .atelier-form-group {
-            margin-bottom: 20px;
-        }
-
-        .atelier-form-label {
-            display: block;
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--text-muted);
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .atelier-input,
-        .atelier-textarea,
-        .atelier-select {
-            width: 100%;
-            padding: 12px 16px;
-            background: var(--dark);
-            border: 1px solid var(--input-border);
-            border-radius: 12px;
-            color: var(--text);
-            font-size: 15px;
-            font-family: inherit;
-            transition: all 0.2s ease;
-        }
-
-        .atelier-input:focus,
-        .atelier-textarea:focus,
-        .atelier-select:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-        }
-
-        .atelier-textarea {
-            min-height: 100px;
-            resize: vertical;
-        }
-
-        /* Tags Input */
-        .atelier-tags-input {
+        .modal-header {
             display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            padding: 8px;
-            background: var(--dark);
-            border: 1px solid var(--input-border);
-            border-radius: 12px;
-            min-height: 48px;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
         }
 
-        .atelier-tag {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-size: 13px;
+        .close-btn {
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
             display: flex;
             align-items: center;
-            gap: 6px;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background var(--transition-fast);
         }
 
-        .atelier-tag-remove {
-            cursor: pointer;
-            opacity: 0.7;
-            transition: opacity 0.2s;
+        .close-btn:hover {
+            background: var(--bg-body);
+            color: var(--text-primary);
         }
 
-        .atelier-tag-remove:hover {
-            opacity: 1;
+        .form-group {
+            margin-bottom: 1.25rem;
         }
 
-        .atelier-tags-input input {
-            flex: 1;
-            min-width: 120px;
-            border: none;
-            background: transparent;
-            color: var(--text);
-            font-size: 14px;
-            outline: none;
-        }
-
-        /* File Upload */
-        .atelier-file-upload {
-            border: 2px dashed var(--border);
-            border-radius: 12px;
-            padding: 32px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .atelier-file-upload:hover {
-            border-color: var(--primary);
-            background: rgba(99, 102, 241, 0.05);
-        }
-
-        .atelier-file-upload.dragover {
-            border-color: var(--primary);
-            background: rgba(99, 102, 241, 0.1);
-        }
-
-        .atelier-file-preview {
-            margin-top: 16px;
-            border-radius: 12px;
-            overflow: hidden;
-        }
-
-        .atelier-file-preview img {
-            width: 100%;
-            height: auto;
+        .form-label {
             display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: var(--text-primary);
         }
 
-        /* Modal Actions */
-        .atelier-modal-actions {
-            display: flex;
-            gap: 12px;
-            margin-top: 24px;
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            background: var(--bg-body);
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
         }
 
-        .atelier-btn {
-            flex: 1;
-            padding: 14px 24px;
-            border: none;
-            border-radius: 12px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
+        .form-input:focus {
+            border-color: var(--color-accent);
+            box-shadow: 0 0 0 2px rgba(0, 113, 227, 0.2);
         }
 
-        .atelier-btn-primary {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+        .btn-primary {
+            width: 100%;
+            padding: 1rem;
+            background: var(--color-accent);
             color: white;
+            font-weight: 600;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: transform 0.1s, background-color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
         }
 
-        .atelier-btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+        .btn-primary:not(:disabled):hover {
+            background: var(--color-accent-hover);
         }
 
-        .atelier-btn-secondary {
-            background: var(--dark-lighter);
-            color: var(--text);
-            border: 1px solid var(--border);
+        .btn-primary:active {
+            transform: scale(0.98);
         }
 
-        .atelier-btn-secondary:hover {
-            background: var(--dark-light);
-        }
-
-        .atelier-btn:disabled {
-            opacity: 0.5;
+        .btn-primary:disabled {
+            opacity: 0.6;
             cursor: not-allowed;
         }
 
-        /* Loading Spinner */
-        .atelier-loading {
-            display: inline-block;
+        .spinner {
             width: 20px;
             height: 20px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
+            border: 2.5px solid rgba(255, 255, 255, 0.3);
             border-top-color: white;
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
+        }
+
+        .btn-copy {
+            margin-top: 1rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            width: auto;
+            min-width: 120px;
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+        }
+
+        .btn-copy:hover {
+            background: var(--bg-body);
         }
 
         @keyframes spin {
@@ -741,1251 +460,709 @@
             }
         }
 
-        /* Success/Error States */
-        .atelier-modal.success .atelier-modal-icon {
-            color: var(--success);
-        }
-
-        .atelier-modal.error .atelier-modal-icon {
-            color: var(--danger);
-        }
-
-        .atelier-modal.warning .atelier-modal-icon {
-            color: var(--warning);
-        }
-
-        /* Progress Bar */
-        .atelier-progress {
-            width: 100%;
-            height: 6px;
-            background: var(--dark-lighter);
-            border-radius: 3px;
-            overflow: hidden;
-            margin: 16px 0;
-        }
-
-        .atelier-progress-bar {
-            height: 100%;
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-            transition: width 0.3s ease;
-            border-radius: 3px;
-        }
-
-        /* Metrics Display */
-        .atelier-metrics {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        /* Toasts */
+        #toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            display: flex;
+            flex-direction: column;
             gap: 12px;
-            margin: 16px 0;
+            z-index: 2000;
         }
 
-        .atelier-metric {
-            background: var(--dark-lighter);
-            padding: 16px;
-            border-radius: 12px;
-            text-align: center;
+        .toast {
+            background: var(--bg-card);
+            border-left: 4px solid var(--color-accent);
+            padding: 1rem 1.25rem;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-lg);
+            min-width: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            animation: slideIn 0.3s ease forwards;
+            color: var(--text-primary);
+            font-size: 0.9rem;
         }
 
-        .atelier-metric-value {
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 4px;
+        .toast.success {
+            border-left-color: var(--color-success);
         }
 
-        .atelier-metric-label {
-            font-size: 12px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+        .toast.error {
+            border-left-color: var(--color-danger);
         }
 
-        /* Tooltip */
-        .atelier-tooltip {
-            position: relative;
-            display: inline-block;
+        .toast.warning {
+            border-left-color: var(--color-warning);
         }
 
-        .atelier-tooltip-text {
-            visibility: hidden;
-            background: var(--dark-light);
-            color: var(--text);
-            text-align: center;
-            padding: 8px 12px;
-            border-radius: 8px;
-            position: absolute;
-            z-index: 10000;
-            bottom: 125%;
-            left: 50%;
-            transform: translateX(-50%);
-            opacity: 0;
-            transition: opacity 0.3s;
-            font-size: 13px;
-            white-space: nowrap;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        .toast.hiding {
+            animation: fadeOut 0.3s ease forwards;
         }
 
-        .atelier-tooltip:hover .atelier-tooltip-text {
-            visibility: visible;
-            opacity: 1;
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
         }
 
-        /* List Items */
-        .atelier-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                transform: translateY(10px);
+            }
         }
 
-        .atelier-list-item {
-            background: var(--dark-lighter);
-            padding: 16px;
-            border-radius: 12px;
-            margin-bottom: 8px;
+        /* Stats Panel (Telemetry) */
+        .stats-panel {
+            margin-top: 1rem;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .stat-row {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            transition: all 0.2s ease;
-        }
-
-        .atelier-list-item:hover {
-            background: var(--dark-light);
-            transform: translateX(4px);
-        }
-
-        .atelier-list-item-title {
-            font-weight: 600;
-            color: var(--text);
-        }
-
-        .atelier-list-item-meta {
-            font-size: 13px;
-            color: var(--text-muted);
-        }
-
-        .atelier-list-item-actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        .atelier-icon-btn {
-            background: transparent;
-            border: none;
-            color: var(--text-muted);
-            cursor: pointer;
-            padding: 8px;
-            border-radius: 8px;
-            transition: all 0.2s ease;
-        }
-
-        .atelier-icon-btn:hover {
-            background: var(--dark);
-            color: var(--text);
-        }
-
-        /* Status Badge */
-        .atelier-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .atelier-badge.success {
-            background: rgba(16, 185, 129, 0.2);
-            color: var(--success);
-        }
-
-        .atelier-badge.error {
-            background: rgba(239, 68, 68, 0.2);
-            color: var(--danger);
-        }
-
-        .atelier-badge.warning {
-            background: rgba(245, 158, 11, 0.2);
-            color: var(--warning);
-        }
-
-        .atelier-badge.info {
-            background: rgba(99, 102, 241, 0.2);
-            color: var(--primary);
-        }
-
-        /* Mobile Responsive */
-        @media (max-width: 768px) {
-            .atelier-modal {
-                width: 95%;
-                max-height: 90vh;
-                padding: 24px;
-            }
-
-            .atelier-modal-title {
-                font-size: 20px;
-            }
-
-            .atelier-modal-actions {
-                flex-direction: column;
-            }
-
-            .atelier-btn {
-                width: 100%;
-            }
-
-            .atelier-metrics {
-                grid-template-columns: repeat(2, 1fr);
-            }
+            padding: 0.25rem 0;
         }
     </style>
 </head>
 
-<body class="dark">
+<body>
 
-    <!-- LOGIN SCREEN -->
-    <div id="loginScreen">
-        <div class="login-card">
-            <div class="logo-title">
-                <h1>Atelier Engine</h1>
-                <p>Panel Administrativo</p>
+    <div class="container">
+        <!-- Main Panel -->
+        <div class="main-panel">
+            <header>
+                <div>
+                    <h1 style="font-size: 1.8rem;" data-i18n="panelTitle">Panel de Control</h1>
+                    <p style="color: var(--text-secondary);" data-i18n="panelSubtitle">Aurelio Contreras Atelier</p>
+                </div>
+                <div class="header-badges">
+                    <div class="status-badge" id="connStatus">
+                        <span class="status-dot"></span>
+                        <span id="connText" data-i18n="statusChecking">Verificando...</span>
+                    </div>
+                    <div class="version-badge" id="versionDisplay">v1.0.0</div>
+                </div>
+            </header>
+
+            <div class="grid" id="actionsGrid">
+                <!-- Tarjetas dinámicas -->
             </div>
-            <form id="loginForm" onsubmit="return panel.handleLogin(event)">
-                <input type="text" id="username" placeholder="Usuario" required>
-                <input type="password" id="password" placeholder="Contraseña" required>
-                <button type="submit">Ingresar</button>
+
+            <!-- Telemetry Stats (Optional) -->
+            <div id="telemetryStats" class="panel-box stats-panel" style="display:none; margin-top:2rem;">
+                <h3 data-i18n="statsTitle">Métricas de Sesión</h3>
+                <div id="statsContent"></div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="panel-box">
+                <h3 data-i18n="previewTitle">Vista Previa</h3>
+                <div id="previewArea" class="preview-content" data-i18n="previewPlaceholder">
+                    Selecciona una acción para ver el resultado aquí.
+                </div>
+            </div>
+
+            <div class="panel-box">
+                <h3 data-i18n="historyTitle">Últimas Acciones</h3>
+                <ul class="history-list" id="historyList">
+                    <li class="empty-state" data-i18n="historyEmpty">Sin actividad reciente</li>
+                </ul>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modalOverlay" aria-modal="true" role="dialog" aria-labelledby="modalTitle">
+        <div class="modal" id="modalContent">
+            <div class="modal-header">
+                <h2 id="modalTitle">Acción</h2>
+                <button class="close-btn" id="modalClose" aria-label="Cerrar modal">&times;</button>
+            </div>
+            <form id="actionForm" novalidate>
+                <div id="modalBody"></div>
+                <div style="margin-top: 2rem;">
+                    <button type="submit" class="btn-primary" id="modalSubmitBtn">
+                        <span class="btn-text" data-i18n="btnExecute">Ejecutar Acción</span>
+                        <div class="spinner" style="display: none;"></div>
+                    </button>
+                    <div id="formErrors"
+                        style="color: var(--color-danger); font-size: 0.85rem; margin-top: 0.5rem; min-height: 1.2em;">
+                    </div>
+                </div>
             </form>
         </div>
     </div>
 
-    <!-- DASHBOARD -->
-    <div id="dashboardContent">
+    <!-- Toasts -->
+    <div id="toast-container"></div>
 
-        <header>
-            <div>
-                <h2>Panel Administrativo</h2>
-                <p>Bienvenido, <strong id="welcomeUser">Admin</strong></p>
-            </div>
-            <div class="header-actions">
-                <button onclick="panel.toggleTheme()" aria-label="Cambiar tema">🌞 / 🌙</button>
-                <button onclick="panel.logout()" class="atelier-btn atelier-btn-secondary" style="flex: none;"
-                    aria-label="Cerrar sesión">Salir</button>
-            </div>
-        </header>
-
-        <!-- MAIN VIEW (ACTION BUTTONS) -->
-        <div id="mainView">
-
-            <!-- 📝 GESTIÓN DE CONTENIDO -->
-            <div class="section">
-                <h3>📝 Gestión de Contenido</h3>
-                <div class="button-grid">
-                    <div class="action-button" onclick="panel.modules.content.generatePost()">
-                        <h4>🧠 Generar nuevas publicaciones</h4>
-                        <p>Crea contenido original con IA basado en temas clave.</p>
-                    </div>
-                    <div class="action-button" onclick="panel.modules.content.schedulePost()">
-                        <h4>📅 Programar publicación</h4>
-                        <p>Define fecha y hora para publicar automáticamente.</p>
-                    </div>
-                    <div class="action-button" onclick="panel.modules.content.generateFromImage()">
-                        <h4>🧬 Generar post desde imagen</h4>
-                        <p>Sube una imagen y genera un post listo para publicar.</p>
-                    </div>
-                    <div class="action-button" onclick="panel.modules.content.pinPost()">
-                        <h4>🧷 Fijar publicación destacada</h4>
-                        <p>Marca un post como "fijado" en el feed.</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ⚙️ SISTEMA Y OPERACIONES -->
-            <div class="section">
-                <h3>⚙️ Sistema y Operaciones</h3>
-                <div class="button-grid">
-                    <div class="action-button" onclick="panel.modules.system.testWorkflow()">
-                        <h4>🧪 Probar flujo en n8n</h4>
-                        <p>Ejecuta un test inmediato del workflow activo.</p>
-                    </div>
-                    <div class="action-button" onclick="panel.modules.system.runDiagnostics()">
-                        <h4>🧰 Diagnóstico del sistema</h4>
-                        <p>Verifica estado de servicios clave (Docker, Nginx, n8n, API).</p>
-                    </div>
-                    <div class="action-button" onclick="panel.modules.system.cleanQueue()">
-                        <h4>🧼 Limpiar cola de publicaciones</h4>
-                        <p>Elimina tareas duplicadas, obsoletas o fallidas.</p>
-                    </div>
-                    <div class="action-button" onclick="panel.modules.system.listPanels()">
-                        <h4>🧭 Navegar paneles activos</h4>
-                        <p>Vista rápida de todos los paneles HTML conectados.</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 🔍 AUDITORÍA Y CONTROL -->
-            <div class="section">
-                <h3>🔍 Auditoría y Control</h3>
-                <div class="button-grid">
-                    <div class="action-button" onclick="panel.modules.audit.viewLogs()">
-                        <h4>📋 Visualizar registros</h4>
-                        <p>Accede al historial de publicaciones y logs del sistema.</p>
-                    </div>
-                    <div class="action-button" onclick="panel.modules.audit.auditContent()">
-                        <h4>🔍 Auditoría de contenido</h4>
-                        <p>Revisa metadatos y calidad de los posts generados.</p>
-                    </div>
-                    <div class="action-button" onclick="panel.modules.audit.exportHistory()">
-                        <h4>🧾 Exportar historial</h4>
-                        <p>Descarga logs y métricas en CSV para análisis externo.</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 🤖 IA Y OPTIMIZACIÓN -->
-            <div class="section">
-                <h3>🤖 IA y Optimización</h3>
-                <div class="button-grid">
-                    <div class="action-button" onclick="panel.modules.ai.retrain()">
-                        <h4>🧠 Reentrenar IA con nuevos datos</h4>
-                        <p>Mejora la generación de contenido con ejemplos recientes.</p>
-                    </div>
-                </div>
-            </div>
-
-        </div><!-- End mainView -->
-
-        <!-- VISTAS SECUNDARIAS (Placeholder simple para mantener la lógica funcional) -->
-        <div id="viewDetail" class="detail-view">
-            <button onclick="panel.showMain()" style="width: auto; margin-bottom: 20px;">← Volver al inicio</button>
-            <h2 id="detailTitle">Detalle</h2>
-            <div id="detailContent">Espacio para respuesta del servidor...</div>
-        </div>
-
-    </div><!-- dashboardContent -->
-
-    <footer>
-        <p>Accede al workflow en <a href="https://n8n.aureliocontrerasatelier.com/workflow/M5SBRoQGspE0CVxx"
-                target="_blank" rel="noopener noreferrer">n8n.aureliocontrerasatelier.com</a></p>
-    </footer>
-
-    <!-- CORE LOGIC MODULE -->
     <script>
         /**
-         * 🎨 Atelier Engine - Advanced Panel Logic
-         * Apple-Style Modal System + Enterprise Features
+         * =========================================
+         * 0. CONFIGURACIÓN & FEATURE FLAGS
+         * =========================================
          */
+        const APP_VERSION = '1.0.0';
 
-        // ==========================================
-        // 🪟 CUSTOM MODAL SYSTEM
-        // ==========================================
+        const DEFAULT_ENV = {
+            baseURL: 'https://n8n.aureliocontrerasatelier.com',
+            webhookPath: '/webhook/panel-action',
+            throttleMs: 3000
+        };
 
-        class AtelierModal {
-            constructor() {
-                this.overlay = null;
-                this.currentModal = null;
-                this.keyboardHandler = this.handleKeyboard.bind(this);
+        const DEFAULT_FLAGS = {
+            enableImageAction: true,
+            enableTelemetry: true,
+            enableMockTester: false // Set to true to test without N8N backend
+        };
+
+        // Load Config from LocalStorage
+        const CONFIG = {
+            ENV: Object.assign(DEFAULT_ENV, JSON.parse(localStorage.getItem('panelEnv') || '{}')),
+            FLAGS: Object.assign(DEFAULT_FLAGS, JSON.parse(localStorage.getItem('featureFlags') || '{}')),
+            SETTINGS: {
+                maxRetries: 3,
+                toastDuration: 4000,
+                maxHistory: 5,
+                closeOnOverlayClick: true
             }
+        };
 
-            create(config) {
-                // Create overlay
-                this.overlay = document.createElement('div');
-                this.overlay.className = 'atelier-modal-overlay';
+        /**
+         * =========================================
+         * 1. I18N ENGINE
+         * =========================================
+         */
+        const DICTIONARY = {
+            es: {
+                panelTitle: 'Panel de Control',
+                panelSubtitle: 'Aurelio Contreras Atelier',
+                statusChecking: 'Verificando...',
+                statusOnline: 'Conectado',
+                statusOffline: 'Offline (En cola)',
+                statusMock: 'Modo Prueba (Mock)',
+                previewTitle: 'Vista Previa',
+                previewPlaceholder: 'Selecciona una acción para ver el resultado aquí.',
+                historyTitle: 'Últimas Acciones',
+                historyEmpty: 'Sin actividad reciente',
+                btnExecute: 'Ejecutar Acción',
+                btnProcessing: 'Procesando...',
+                btnCopy: 'Copiar Resultado',
+                errRequired: 'Por favor completa los campos requeridos.',
+                errServer: 'Error en el servidor',
+                errNetwork: 'Error de red. Guardado en cola.',
+                msgSuccess: 'Acción ejecutada correctamente',
+                msgCopied: 'Copiado al portapapeles',
+                msgRateLimit: 'Demasiadas solicitudes. Espera un momento.',
+                msgQueueProcessed: 'Acciones offline procesadas',
+                statsTitle: 'Métricas de Sesión'
+            },
+            en: {
+                panelTitle: 'Control Panel',
+                panelSubtitle: 'Aurelio Contreras Atelier',
+                statusChecking: 'Checking...',
+                statusOnline: 'Connected',
+                statusOffline: 'Offline (Queued)',
+                statusMock: 'Test Mode (Mock)',
+                previewTitle: 'Preview',
+                previewPlaceholder: 'Select an action to view results here.',
+                historyTitle: 'Recent Actions',
+                historyEmpty: 'No recent activity',
+                btnExecute: 'Execute Action',
+                btnProcessing: 'Processing...',
+                btnCopy: 'Copy Result',
+                errRequired: 'Please complete required fields.',
+                errServer: 'Server Error',
+                errNetwork: 'Network error. Queued.',
+                msgSuccess: 'Action executed successfully',
+                msgCopied: 'Copied to clipboard',
+                msgRateLimit: 'Too many requests. Please wait.',
+                msgQueueProcessed: 'Offline actions processed',
+                statsTitle: 'Session Metrics'
+            }
+        };
 
-                // Create modal
-                const modal = document.createElement('div');
-                modal.className = `atelier-modal ${config.type || ''}`;
+        const I18n = {
+            lang: navigator.language.startsWith('es') ? 'es' : 'en',
+            t: (key) => DICTIONARY[I18n.lang][key] || key,
+            updateUI: () => {
+                document.querySelectorAll('[data-i18n]').forEach(el => {
+                    const key = el.getAttribute('data-i18n');
+                    el.textContent = I18n.t(key);
+                });
+            }
+        };
 
-                // Build content
-                modal.innerHTML = `
-                    <div class="atelier-modal-header">
-                        ${config.icon ? `<span class="atelier-modal-icon">${config.icon}</span>` : ''}
-                        <h3 class="atelier-modal-title">${config.title}</h3>
-                        ${config.subtitle ? `<p class="atelier-modal-subtitle">${config.subtitle}</p>` : ''}
+        /**
+         * =========================================
+         * 2. TELEMETRY & AUDIT
+         * =========================================
+         */
+        const Telemetry = {
+            metrics: { success: 0, error: 0, actions: {} },
+
+            log: (type, actionKey) => {
+                if (!CONFIG.FLAGS.enableTelemetry) return;
+
+                // Update counters
+                if (type === 'SUCCESS') Telemetry.metrics.success++;
+                if (type === 'ERROR') Telemetry.metrics.error++;
+                Telemetry.metrics.actions[actionKey] = (Telemetry.metrics.actions[actionKey] || 0) + 1;
+
+                // Update UI if visible
+                Telemetry.renderStats();
+            },
+
+            audit: (event, data) => {
+                // Console Audit
+                console.groupCollapsed(`[AUDIT] ${event} @ ${new Date().toLocaleTimeString()}`);
+                console.log('UserAgent:', navigator.userAgent);
+                console.log('Language:', I18n.lang);
+                console.log('Payload/Data:', data);
+                console.groupEnd();
+            },
+
+            renderStats: () => {
+                const el = document.getElementById('statsContent');
+                if (!el) return;
+                el.innerHTML = `
+                    <div class="stat-row"><span>Success:</span> <span style="color:var(--color-success)">${Telemetry.metrics.success}</span></div>
+                    <div class="stat-row"><span>Errors:</span> <span style="color:var(--color-danger)">${Telemetry.metrics.error}</span></div>
+                    <div style="margin-top:0.5rem; border-top:1px solid var(--border-color); padding-top:0.5rem">
+                        ${Object.entries(Telemetry.metrics.actions).map(([k, v]) => `<div class="stat-row"><span>${k}:</span> <span>${v}</span></div>`).join('')}
                     </div>
-                    <div class="atelier-modal-body">
-                        ${config.content || ''}
-                    </div>
-                    ${config.actions ? `
-                        <div class="atelier-modal-actions">
-                            ${config.actions}
-                        </div>
-                    ` : ''}
                 `;
-
-                this.overlay.appendChild(modal);
-                document.body.appendChild(this.overlay);
-                this.currentModal = modal;
-
-                // Activate with animation
-                requestAnimationFrame(() => {
-                    this.overlay.classList.add('active');
-                });
-
-                // Keyboard support
-                document.addEventListener('keydown', this.keyboardHandler);
-
-                return modal;
             }
+        };
 
-            close() {
-                if (!this.overlay) return;
-
-                this.overlay.classList.remove('active');
-                document.removeEventListener('keydown', this.keyboardHandler);
-
-                setTimeout(() => {
-                    if (this.overlay && this.overlay.parentNode) {
-                        this.overlay.parentNode.removeChild(this.overlay);
-                    }
-                    this.overlay = null;
-                    this.currentModal = null;
-                }, 300);
+        /**
+         * =========================================
+         * 3. ACTIONS DEFINITION
+         * =========================================
+         */
+        const ACTIONS_CONFIG = {
+            'generate_posts': {
+                title: { es: 'Generar Publicaciones', en: 'Generate Posts' },
+                desc: { es: 'Crear nuevos posts con IA base', en: 'Create new posts with AI' },
+                icon: '✨',
+                fields: [
+                    { id: 'theme', label: { es: 'Tema Principal', en: 'Main Theme' }, type: 'text', placeholder: 'Minimalismo...', required: true },
+                    { id: 'tone', label: { es: 'Tono', en: 'Tone' }, type: 'select', options: ['Elegante', 'Casual', 'Informativo'], required: true }
+                ],
+                preview: (data) => `<strong>Posts:</strong><br>${data.titles ? data.titles.join('<br>') : 'OK'}`
+            },
+            'schedule_post': {
+                title: { es: 'Programar Publicación', en: 'Schedule Post' },
+                desc: { es: 'Agendar contenido para el futuro', en: 'Schedule content for future' },
+                icon: '📅',
+                fields: [
+                    { id: 'date', label: { es: 'Fecha', en: 'Date' }, type: 'date', required: true },
+                    { id: 'time', label: { es: 'Hora', en: 'Time' }, type: 'time', required: true },
+                    { id: 'content_id', label: 'ID (Ops)', type: 'text', placeholder: 'Auto' }
+                ],
+                preview: (data) => `✅ <strong>Scheduled</strong><br>${data.scheduledDate || 'TBD'}`
+            },
+            'system_diag': {
+                title: { es: 'Diagnóstico del Sistema', en: 'System Diagnosis' },
+                desc: { es: 'Verificar salud de servicios', en: 'Check service health' },
+                icon: '🩺',
+                fields: [],
+                preview: (data) => `<strong>System Status:</strong><br>${data.healthy ? '🟢 Healthy' : '🔴 Issues'}`
+            },
+            'upload_media': {
+                title: { es: 'Subir Media', en: 'Upload Media' },
+                desc: { es: 'Cargar imagen para post', en: 'Upload image for post' },
+                icon: '📷',
+                flag: 'enableImageAction', // Feature Flag
+                fields: [
+                    { id: 'file', label: { es: 'Imagen (Max 2MB)', en: 'Image (Max 2MB)' }, type: 'file', accept: 'image/*', required: true },
+                    { id: 'caption', label: { es: 'Descripción', en: 'Caption' }, type: 'text' }
+                ],
+                preview: (data) => `📸 <strong>Uploaded</strong><br>URL: ${data.fileUrl || 'Generated'}`
             }
+        };
 
-            handleKeyboard(e) {
-                if (e.key === 'Escape') {
-                    this.close();
+        /**
+         * =========================================
+         * 4. STATE & UTILS
+         * =========================================
+         */
+        const State = {
+            history: JSON.parse(localStorage.getItem('panelHistory') || '[]'),
+            queue: JSON.parse(localStorage.getItem('panelQueue') || '[]'),
+            lastActionTime: 0,
+            currentAction: null
+        };
+
+        const Utils = {
+            uuid: () => 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+                const r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            }),
+            formatDate: (ts) => new Date(ts).toLocaleString(I18n.lang, {
+                month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+            })
+        };
+
+        /**
+         * =========================================
+         * 5. NETWORK ENGINE (MOCK + RETRY)
+         * =========================================
+         */
+        const Network = {
+            send: async (payload) => {
+                // Mock Mode Check
+                if (CONFIG.FLAGS.enableMockTester) {
+                    await new Promise(r => setTimeout(r, 1000)); // Simulate latency
+                    return Network.getMockResponse(payload);
                 }
-            }
 
-            showLoading(title = 'Procesando...', subtitle = 'Por favor espera') {
-                return this.create({
-                    icon: '<div class="atelier-loading"></div>',
-                    title,
-                    subtitle
-                });
-            }
+                // Real Network Call
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 15000);
 
-            showSuccess(title, message) {
-                return this.create({
-                    type: 'success',
-                    icon: '✅',
-                    title,
-                    subtitle: message,
-                    actions: `
-                        <button class="atelier-btn atelier-btn-primary" onclick="modal.close()">
-                            Entendido
-                        </button>
-                    `
-                });
-            }
+                try {
+                    const token = localStorage.getItem('panelToken');
+                    const headers = {
+                        'Content-Type': 'application/json',
+                        'X-Request-ID': payload.requestId,
+                        'X-Client-Version': APP_VERSION
+                    };
+                    if (token) headers['Authorization'] = `Bearer ${token}`;
 
-            showError(title, message) {
-                return this.create({
-                    type: 'error',
-                    icon: '❌',
-                    title,
-                    subtitle: message,
-                    actions: `
-                        <button class="atelier-btn atelier-btn-secondary" onclick="modal.close()">
-                            Cerrar
-                        </button>
-                    `
-                });
-            }
+                    const res = await fetch(CONFIG.ENV.baseURL + CONFIG.ENV.webhookPath, {
+                        method: 'POST',
+                        headers: headers,
+                        body: JSON.stringify(payload),
+                        signal: controller.signal
+                    });
 
-            showWarning(title, message, onConfirm) {
-                const modal = this.create({
-                    type: 'warning',
-                    icon: '⚠️',
-                    title,
-                    subtitle: message,
-                    actions: `
-                        <button class="atelier-btn atelier-btn-secondary" onclick="modal.close()">
-                            Cancelar
-                        </button>
-                        <button class="atelier-btn atelier-btn-primary" id="confirm-btn">
-                            Confirmar
-                        </button>
-                    `
-                });
+                    clearTimeout(timeoutId);
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    return await res.json();
+                } catch (err) {
+                    clearTimeout(timeoutId);
+                    throw err;
+                }
+            },
 
-                document.getElementById('confirm-btn').onclick = () => {
-                    this.close();
-                    if (onConfirm) onConfirm();
-                };
-
-                return modal;
-            }
-        }
-
-        // Global modal instance
-        const modal = new AtelierModal();
-
-        // ==========================================
-        // 📊 METRICS TRACKER
-        // ==========================================
-
-        class MetricsTracker {
-            constructor() {
-                this.metrics = JSON.parse(localStorage.getItem('atelier_metrics')) || {
-                    postsGenerated: 0,
-                    postsScheduled: 0,
-                    imagesProcessed: 0,
-                    workflowTests: 0,
-                    diagnosticsRun: 0,
-                    errors: 0,
-                    totalActions: 0,
-                    lastAction: null
-                };
-            }
-
-            increment(key) {
-                this.metrics[key] = (this.metrics[key] || 0) + 1;
-                this.metrics.totalActions++;
-                this.metrics.lastAction = new Date().toISOString();
-                this.save();
-            }
-
-            get(key) {
-                return this.metrics[key] || 0;
-            }
-
-            save() {
-                localStorage.setItem('atelier_metrics', JSON.stringify(this.metrics));
-            }
-
-            getAll() {
-                return this.metrics;
-            }
-        }
-
-        // ==========================================
-        // 🧠 MAIN PANEL CLASS
-        // ==========================================
-
-        class AtelierPanel {
-            constructor() {
-                this.config = {
-                    webhookUrl: "https://n8n.aureliocontrerasatelier.com/webhook/panel-action",
-                    headers: {
-                        "Content-Type": "application/json"
+            getMockResponse: (payload) => {
+                return {
+                    success: true,
+                    mock: true,
+                    data: {
+                        titles: ['Post Demo 1', 'Post Demo 2'],
+                        scheduledDate: '2025-12-15 10:00',
+                        healthy: true,
+                        fileUrl: 'https://via.placeholder.com/150'
                     }
                 };
+            },
 
-                this.user = JSON.parse(sessionStorage.getItem('atelier_session'))?.username || null;
-                this.metrics = new MetricsTracker();
-                this.logs = [];
+            processQueue: async () => {
+                if (State.queue.length === 0 || !navigator.onLine) return;
 
-                // Initialize modules
-                this.modules = {
-                    content: new ContentModule(this),
-                    system: new SystemModule(this),
-                    audit: new AuditModule(this),
-                    ai: new AIModule(this)
-                };
+                const queueCopy = [...State.queue];
+                State.queue = [];
+                localStorage.setItem('panelQueue', '[]');
 
-                this.init();
-            }
-
-            init() {
-                if (this.user) {
-                    this.showDashboard(this.user);
-                }
-            }
-
-            // --- AUTHENTICATION ---
-            handleLogin(event) {
-                event.preventDefault();
-                const u = document.getElementById("username").value.trim();
-                const p = document.getElementById("password").value.trim();
-
-                if (u === "econtreras" && p === "Ec1330") {
-                    this.user = u;
-                    sessionStorage.setItem('atelier_session', JSON.stringify({ username: u }));
-                    this.showDashboard(u);
-                    modal.showSuccess("¡Bienvenido!", "Sesión iniciada correctamente");
-                } else {
-                    modal.showError("Acceso Denegado", "Credenciales inválidas");
-                }
-            }
-
-            logout() {
-                modal.showWarning(
-                    "¿Cerrar Sesión?",
-                    "Se perderá el progreso no guardado",
-                    () => {
-                        sessionStorage.removeItem('atelier_session');
-                        location.reload();
+                let processed = 0;
+                for (const item of queueCopy) {
+                    try {
+                        await Network.send(item);
+                        App.addToHistory(item.action, true);
+                        processed++;
+                    } catch (e) {
+                        // Re-queue if failed
+                        State.queue.push(item);
                     }
-                );
+                }
+                localStorage.setItem('panelQueue', JSON.stringify(State.queue));
+                if (processed > 0) Toast.show(I18n.t('msgQueueProcessed'), 'success');
+                UI.renderHistory();
             }
+        };
 
-            showDashboard(username) {
-                document.getElementById("loginScreen").style.display = "none";
-                document.getElementById("dashboardContent").style.display = "block";
-                document.getElementById("welcomeUser").innerText = username;
-            }
+        /**
+         * =========================================
+         * 6. UI MANAGER
+         * =========================================
+         */
+        const UI = {
+            renderGrid: () => {
+                const container = document.getElementById('actionsGrid');
+                container.innerHTML = Object.entries(ACTIONS_CONFIG).map(([key, action]) => {
+                    // Feature Flag Check
+                    if (action.flag && !CONFIG.FLAGS[action.flag]) return '';
 
-            toggleTheme() {
-                document.body.classList.toggle("light");
-            }
+                    const title = action.title[I18n.lang] || action.title.es;
+                    const desc = action.desc[I18n.lang] || action.desc.es;
 
-            showMain() {
-                document.querySelectorAll(".detail-view").forEach(v => v.classList.remove("active"));
-                document.getElementById("mainView").style.display = "block";
-            }
+                    return `
+                    <div class="card" role="button" tabindex="0" onclick="App.openModal('${key}')">
+                        <span class="card-icon" aria-hidden="true">${action.icon}</span>
+                        <div class="card-title">${title}</div>
+                        <div class="card-desc">${desc}</div>
+                    </div>`;
+                }).join('');
+            },
 
-            showDetail(title, content = '') {
-                document.getElementById("mainView").style.display = "none";
-                const detailView = document.getElementById("viewDetail");
-                document.getElementById("detailTitle").innerText = title;
-                document.getElementById("detailContent").innerHTML = content || '<p>Cargando datos...</p>';
-                detailView.classList.add("active");
-            }
+            renderHistory: () => {
+                const container = document.getElementById('historyList');
+                if (State.history.length === 0) {
+                    container.innerHTML = `<li class="empty-state">${I18n.t('historyEmpty')}</li>`;
+                    return;
+                }
+                container.innerHTML = State.history.map(item => `
+                    <li class="history-item">
+                        <div class="history-meta">
+                            <span class="history-action">${(ACTIONS_CONFIG[item.action]?.title[I18n.lang] || item.action)}</span>
+                            <span class="history-time">${Utils.formatDate(item.ts)}</span>
+                        </div>
+                        <span class="history-status" title="${item.success ? 'Success' : 'Error'}">
+                            ${item.success ? '✅' : '❌'}
+                        </span>
+                    </li>
+                `).join('');
+            },
 
-            // --- CORE API HANDLER ---
-            async sendRequest(actionName, payload = {}) {
-                if (!this.user) {
-                    modal.showError("Acceso Denegado", "Debes iniciar sesión");
+            updateConnStatus: () => {
+                const dot = document.querySelector('.status-dot');
+                const text = document.getElementById('connText');
+
+                if (CONFIG.FLAGS.enableMockTester) {
+                    dot.className = 'status-dot warning';
+                    dot.style.background = 'var(--color-warning)';
+                    text.textContent = I18n.t('statusMock');
                     return;
                 }
 
-                // Log the action
-                this.logAction(actionName, 'initiated', payload);
-
-                // Show loading
-                modal.showLoading('Procesando...', `Ejecutando: ${actionName}`);
-
-                try {
-                    const requestBody = {
-                        action: actionName,
-                        payload: payload,
-                        user: this.user,
-                        timestamp: new Date().toISOString()
-                    };
-
-                    console.log("📤 Sending:", requestBody);
-
-                    const startTime = Date.now();
-                    const response = await fetch(this.config.webhookUrl, {
-                        method: "POST",
-                        headers: this.config.headers,
-                        body: JSON.stringify(requestBody)
-                    });
-
-                    const duration = ((Date.now() - startTime) / 1000).toFixed(2);
-
-                    if (!response.ok) {
-                        throw new Error(`Server error: ${response.status} ${response.statusText}`);
-                    }
-
-                    const data = await response.json();
-
-                    // Log success
-                    this.logAction(actionName, 'success', { duration, response: data });
-
-                    // Close loading and show success
-                    modal.close();
-                    setTimeout(() => {
-                        modal.showSuccess(
-                            'Operación Exitosa',
-                            data.message || `${actionName} completado en ${duration}s`
-                        );
-                    }, 100);
-
-                    return data;
-
-                } catch (error) {
-                    console.error("❌ Error:", error);
-                    this.metrics.increment('errors');
-                    this.logAction(actionName, 'error', { error: error.message });
-
-                    modal.close();
-                    setTimeout(() => {
-                        modal.showError(
-                            'Error de Conexión',
-                            `No se pudo contactar al servidor n8n. ${error.message}`
-                        );
-                    }, 100);
+                if (navigator.onLine) {
+                    dot.className = 'status-dot online';
+                    text.textContent = I18n.t('statusOnline');
+                } else {
+                    dot.className = 'status-dot offline';
+                    text.textContent = I18n.t('statusOffline');
                 }
+            },
+
+            setLoading: (isLoading) => {
+                const btn = document.getElementById('modalSubmitBtn');
+                const spinner = btn.querySelector('.spinner');
+                const text = btn.querySelector('.btn-text');
+                btn.disabled = isLoading;
+                spinner.style.display = isLoading ? 'block' : 'none';
+                text.textContent = isLoading ? I18n.t('btnProcessing') : I18n.t('btnExecute');
             }
+        };
 
-            logAction(action, status, metadata = {}) {
-                const log = {
-                    timestamp: new Date().toISOString(),
-                    user: this.user,
-                    action,
-                    status,
-                    metadata
-                };
+        const Toast = {
+            show: (msg, type = 'info') => {
+                const container = document.getElementById('toast-container');
+                const el = document.createElement('div');
+                el.className = `toast ${type}`;
+                el.textContent = msg;
+                container.appendChild(el);
+                setTimeout(() => {
+                    el.classList.add('hiding');
+                    el.addEventListener('animationend', () => el.remove());
+                }, CONFIG.SETTINGS.toastDuration);
+            }
+        };
 
-                this.logs.push(log);
+        /**
+         * =========================================
+         * 7. MAIN APP CONTROLLER
+         * =========================================
+         */
+        const App = {
+            init: () => {
+                // Initialize I18n
+                I18n.updateUI();
+                document.getElementById('versionDisplay').textContent = `v${APP_VERSION}`;
 
-                // Keep only last 100 logs
-                if (this.logs.length > 100) {
-                    this.logs = this.logs.slice(-100);
+                if (CONFIG.FLAGS.enableTelemetry) {
+                    document.getElementById('telemetryStats').style.display = 'block';
+                    Telemetry.renderStats();
                 }
 
-                console.log(`[${status.toUpperCase()}]`, action, metadata);
-            }
+                UI.renderGrid();
+                UI.renderHistory();
+                UI.updateConnStatus();
 
-            sanitize(input) {
-                if (typeof input !== 'string') return input;
-                return input
-                    .replace(/<script[^>]*>.*?<\/script>/gi, '')
-                    .replace(/<[^>]+>/g, '')
-                    .trim();
-            }
-        }
+                // Listeners
+                window.addEventListener('online', () => { UI.updateConnStatus(); Network.processQueue(); });
+                window.addEventListener('offline', () => { UI.updateConnStatus(); });
 
-        // ==========================================
-        // 📝 CONTENT MODULE (ADVANCED)
-        // ==========================================
-
-        class BaseModule {
-            constructor(panel) {
-                this.panel = panel;
-            }
-        }
-
-        class ContentModule extends BaseModule {
-
-            async generatePost() {
-                const modalContent = `
-                    <div class="atelier-form-group">
-                        <label class="atelier-form-label">Tema Principal *</label>
-                        <input type="text" id="topic" class="atelier-input" placeholder="Ej: Diseño Minimalista" required>
-                    </div>
-                    <div class="atelier-form-group">
-                        <label class="atelier-form-label">Keywords (presiona Enter para agregar)</label>
-                        <div class="atelier-tags-input" id="keywords-container">
-                            <input type="text" id="keywords-input" placeholder="Agregar keyword...">
-                        </div>
-                    </div>
-                    <div class="atelier-form-group">
-                        <label class="atelier-form-label">Tono</label>
-                        <select class="atelier-select" id="tone">
-                            <option value="professional">Profesional</option>
-                            <option value="casual">Casual</option>
-                            <option value="creative">Creativo</option>
-                        </select>
-                    </div>
-                    <div class="atelier-metrics">
-                        <div class="atelier-metric">
-                            <div class="atelier-metric-value">${this.panel.metrics.get('postsGenerated')}</div>
-                            <div class="atelier-metric-label">Posts Generados</div>
-                        </div>
-                        <div class="atelier-metric">
-                            <div class="atelier-metric-value">${this.panel.metrics.get('totalActions')}</div>
-                            <div class="atelier-metric-label">Acciones Totales</div>
-                        </div>
-                    </div>
-                `;
-
-                const modalEl = modal.create({
-                    icon: '🧠',
-                    title: 'Generar Contenido IA',
-                    subtitle: 'Define los parámetros para el motor generativo',
-                    content: modalContent,
-                    actions: `
-                        <button class="atelier-btn atelier-btn-secondary" onclick="modal.close()">Cancelar</button>
-                        <button class="atelier-btn atelier-btn-primary" id="generate-btn">Generar</button>
-                    `
-                });
-
-                // Tags input logic
-                const keywords = [];
-                const keywordsInput = document.getElementById('keywords-input');
-                const keywordsContainer = document.getElementById('keywords-container');
-
-                keywordsInput.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter' && keywordsInput.value.trim()) {
-                        e.preventDefault();
-                        const keyword = keywordsInput.value.trim();
-                        keywords.push(keyword);
-
-                        const tag = document.createElement('span');
-                        tag.className = 'atelier-tag';
-                        tag.innerHTML = `${keyword} <span class="atelier-tag-remove" onclick="this.parentElement.remove()">×</span>`;
-                        keywordsContainer.insertBefore(tag, keywordsInput);
-                        keywordsInput.value = '';
-                    }
-                });
-
-                // Generate button
-                document.getElementById('generate-btn').onclick = async () => {
-                    const topic = document.getElementById('topic').value.trim();
-                    const tone = document.getElementById('tone').value;
-
-                    if (!topic || topic.length < 5) {
-                        modal.showError('Validación', 'El tema debe tener al menos 5 caracteres');
-                        return;
-                    }
-
-                    if (keywords.length === 0) {
-                        modal.showWarning('Advertencia', '¿Continuar sin keywords?', async () => {
-                            await this.executeGeneration(topic, keywords, tone);
-                        });
-                    } else {
-                        await this.executeGeneration(topic, keywords, tone);
-                    }
+                document.getElementById('modalClose').onclick = App.closeModal;
+                document.getElementById('modalOverlay').onclick = (e) => {
+                    if (CONFIG.SETTINGS.closeOnOverlayClick && e.target.id === 'modalOverlay') App.closeModal();
                 };
-            }
 
-            async executeGeneration(topic, keywords, tone) {
-                modal.close();
+                document.getElementById('actionForm').onsubmit = App.handleSubmit;
+            },
 
-                // Check for duplicates
-                const duplicateCheck = await this.panel.sendRequest('checkDuplicates', { topic, keywords });
-
-                // Generate post
-                const result = await this.panel.sendRequest('generatePost', {
-                    topic: this.panel.sanitize(topic),
-                    keywords: keywords.map(k => this.panel.sanitize(k)),
-                    tone
-                });
-
-                if (result) {
-                    this.panel.metrics.increment('postsGenerated');
+            openModal: (actionKey) => {
+                // Rate Limiting Check
+                const now = Date.now();
+                if (now - State.lastActionTime < CONFIG.ENV.throttleMs) {
+                    Toast.show(I18n.t('msgRateLimit'), 'warning');
+                    return;
                 }
-            }
 
-            async schedulePost() {
-                const modalContent = `
-                    <div class="atelier-form-group">
-                        <label class="atelier-form-label">Fecha y Hora</label>
-                        <input type="datetime-local" id="schedule-date" class="atelier-input" required>
-                    </div>
-                    <div class="atelier-form-group">
-                        <label class="atelier-form-label">Post a Programar</label>
-                        <select class="atelier-select" id="post-select">
-                            <option value="">Cargando posts...</option>
-                        </select>
-                    </div>
-                    <div class="atelier-metrics">
-                        <div class="atelier-metric">
-                            <div class="atelier-metric-value">${this.panel.metrics.get('postsScheduled')}</div>
-                            <div class="atelier-metric-label">Programados</div>
-                        </div>
-                    </div>
-                `;
+                State.currentAction = actionKey;
+                const config = ACTIONS_CONFIG[actionKey];
 
-                modal.create({
-                    icon: '📅',
-                    title: 'Programar Publicación',
-                    subtitle: 'Agenda tu contenido para publicación automática',
-                    content: modalContent,
-                    actions: `
-                        <button class="atelier-btn atelier-btn-secondary" onclick="modal.close()">Cancelar</button>
-                        <button class="atelier-btn atelier-btn-primary" id="schedule-btn">Programar</button>
-                    `
-                });
+                document.getElementById('modalTitle').textContent = config.title[I18n.lang];
+                const body = document.getElementById('modalBody');
 
-                // Set minimum date to now + 5 minutes
-                const now = new Date();
-                now.setMinutes(now.getMinutes() + 5);
-                document.getElementById('schedule-date').min = now.toISOString().slice(0, 16);
+                // Build Fields
+                if (config.fields.length === 0) {
+                    body.innerHTML = `<p style="text-align:center;color:var(--text-secondary)">${config.desc[I18n.lang]}</p>`;
+                } else {
+                    body.innerHTML = config.fields.map(field => {
+                        const label = typeof field.label === 'object' ? field.label[I18n.lang] : field.label;
+                        let inputHtml = '';
 
-                // Fetch posts for dropdown
-                this.panel.sendRequest('getRecentPosts', { limit: 10 }).then(data => {
-                    const select = document.getElementById('post-select');
-                    if (data && data.data && Array.isArray(data.data)) {
-                        select.innerHTML = '<option value="">Selecciona un post...</option>';
-                        data.data.forEach(post => {
-                            const option = document.createElement('option');
-                            option.value = post.id || post.topic;
-                            option.textContent = post.topic || 'Sin Título';
-                            select.appendChild(option);
-                        });
-                    } else {
-                        select.innerHTML = '<option value="">No hay posts disponibles</option>';
-                    }
-                }).catch(() => {
-                    const el = document.getElementById('post-select');
-                    if (el) el.innerHTML = '<option value="">Error al cargar</option>';
-                });
-
-                document.getElementById('schedule-btn').onclick = async () => {
-                    const scheduledTime = document.getElementById('schedule-date').value;
-                    const postId = document.getElementById('post-select').value;
-
-                    if (!scheduledTime || !postId) {
-                        modal.showError('Validación', 'Completa todos los campos');
-                        return;
-                    }
-
-                    modal.close();
-
-                    // Check conflicts
-                    await this.panel.sendRequest('checkScheduleConflicts', { scheduledTime });
-
-                    // Schedule
-                    const result = await this.panel.sendRequest('schedulePost', { postId, scheduledTime });
-
-                    if (result) {
-                        this.panel.metrics.increment('postsScheduled');
-                    }
-                };
-            }
-
-            async generateFromImage() {
-                const modalContent = `
-                    <div class="atelier-file-upload" id="file-upload">
-                        <div style="font-size: 48px; margin-bottom: 12px;">📸</div>
-                        <p style="color: var(--text); font-weight: 600; margin-bottom: 8px;">
-                            Arrastra una imagen o haz clic para seleccionar
-                        </p>
-                        <p style="color: var(--text-muted); font-size: 13px;">
-                            JPG, PNG, WEBP • Máx 5MB
-                        </p>
-                        <input type="file" id="file-input" accept="image/*" style="display: none;">
-                    </div>
-                    <div id="preview-container"></div>
-                    <div class="atelier-metrics">
-                        <div class="atelier-metric">
-                            <div class="atelier-metric-value">${this.panel.metrics.get('imagesProcessed')}</div>
-                            <div class="atelier-metric-label">Imágenes Procesadas</div>
-                        </div>
-                    </div>
-                `;
-
-                modal.create({
-                    icon: '🧬',
-                    title: 'Post desde Imagen',
-                    subtitle: 'La IA analizará la imagen y creará el copy perfecto',
-                    content: modalContent,
-                    actions: `
-                        <button class="atelier-btn atelier-btn-secondary" onclick="modal.close()">Cancelar</button>
-                        <button class="atelier-btn atelier-btn-primary" id="process-btn" disabled>Procesar</button>
-                    `
-                });
-
-                let selectedFile = null;
-                const fileUpload = document.getElementById('file-upload');
-                const fileInput = document.getElementById('file-input');
-                const processBtn = document.getElementById('process-btn');
-                const previewContainer = document.getElementById('preview-container');
-
-                // Click to upload
-                fileUpload.onclick = () => fileInput.click();
-
-                // Drag & drop
-                fileUpload.ondragover = (e) => {
-                    e.preventDefault();
-                    fileUpload.classList.add('dragover');
-                };
-
-                fileUpload.ondragleave = () => {
-                    fileUpload.classList.remove('dragover');
-                };
-
-                fileUpload.ondrop = (e) => {
-                    e.preventDefault();
-                    fileUpload.classList.remove('dragover');
-                    if (e.dataTransfer.files.length) {
-                        handleFile(e.dataTransfer.files[0]);
-                    }
-                };
-
-                fileInput.onchange = (e) => {
-                    if (e.target.files.length) {
-                        handleFile(e.target.files[0]);
-                    }
-                };
-
-                const handleFile = (file) => {
-                    if (!file.type.startsWith('image/')) {
-                        modal.showError('Error', 'Solo se permiten imágenes');
-                        return;
-                    }
-
-                    if (file.size > 5 * 1024 * 1024) {
-                        modal.showError('Error', 'La imagen no debe superar 5MB');
-                        return;
-                    }
-
-                    selectedFile = file;
-                    processBtn.disabled = false;
-
-                    // Show preview
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        previewContainer.innerHTML = `
-                            <div class="atelier-file-preview">
-                                <img src="${e.target.result}" alt="Preview">
-                            </div>
-                        `;
-                    };
-                    reader.readAsDataURL(file);
-                };
-
-                processBtn.onclick = async () => {
-                    if (!selectedFile) return;
-
-                    const reader = new FileReader();
-                    reader.onload = async (e) => {
-                        modal.close();
-
-                        const result = await this.panel.sendRequest('generateFromImage', {
-                            imageName: selectedFile.name,
-                            imageBase64: e.target.result,
-                            size: selectedFile.size
-                        });
-
-                        if (result) {
-                            this.panel.metrics.increment('imagesProcessed');
+                        if (field.type === 'select') {
+                            inputHtml = `<select id="f_${field.id}" class="form-input" ${field.required ? 'required' : ''}>
+                                ${field.options.map(o => `<option value="${o}">${o}</option>`).join('')}
+                            </select>`;
+                        } else {
+                            inputHtml = `<input type="${field.type}" id="f_${field.id}" class="form-input" 
+                                placeholder="${field.placeholder || ''}" ${field.required ? 'required' : ''} 
+                                ${field.accept ? `accept="${field.accept}"` : ''}>`;
                         }
-                    };
-                    reader.readAsDataURL(selectedFile);
-                };
-            }
+                        return `<div class="form-group"><label class="form-label">${label}</label>${inputHtml}</div>`;
+                    }).join('');
+                }
 
-            async pinPost() {
-                modal.create({
-                    icon: '🧷',
-                    title: 'Fijar Publicación',
-                    subtitle: 'Marca un post como destacado en el feed',
-                    content: `
-                        <div class="atelier-form-group">
-                            <label class="atelier-form-label">Selecciona el Post a Fijar</label>
-                            <ul class="atelier-list" id="posts-list" style="max-height:300px;overflow-y:auto;">
-                                <li class="atelier-list-item">
-                                    <div class="atelier-list-item-title">Cargando posts...</div>
-                                </li>
-                            </ul>
-                        </div>
-                    `,
-                    actions: `<button class="atelier-btn atelier-btn-secondary" onclick="modal.close()">Cancelar</button>`
-                });
+                document.getElementById('modalOverlay').classList.add('open');
+                document.body.style.overflow = 'hidden';
+            },
 
-                this.panel.sendRequest('getRecentPosts', { limit: 10 }).then(data => {
-                    const list = document.getElementById('posts-list');
-                    if (data && data.data && data.data.length > 0) {
-                        list.innerHTML = data.data.map(p => `
-                            <li class="atelier-list-item">
-                                <div>
-                                    <div class="atelier-list-item-title">${p.topic || 'Sin título'}</div>
-                                    <div class="atelier-list-item-meta">${new Date(p.timestamp || Date.now()).toLocaleDateString()}</div>
-                                </div>
-                                <button class="atelier-btn atelier-btn-primary" 
-                                    style="padding:4px 12px;font-size:12px;"
-                                    onclick="panel.modules.content.executePin('${p.id}')">
-                                    Fijar
-                                </button>
-                            </li>
-                        `).join('');
+            closeModal: () => {
+                document.getElementById('modalOverlay').classList.remove('open');
+                document.body.style.overflow = '';
+                document.getElementById('actionForm').reset();
+                State.currentAction = null;
+            },
+
+            handleSubmit: async (e) => {
+                e.preventDefault();
+                State.lastActionTime = Date.now();
+
+                const actionKey = State.currentAction;
+                const config = ACTIONS_CONFIG[actionKey];
+                const errorDiv = document.getElementById('formErrors');
+                errorDiv.textContent = '';
+
+                // Validation & Data Collection
+                const formData = {};
+                let isValid = true;
+                for (const field of config.fields) {
+                    const el = document.getElementById(`f_${field.id}`);
+                    if (field.required && !el.value) isValid = false;
+
+                    if (field.type === 'file' && el.files.length > 0) {
+                        formData[field.id] = { name: el.files[0].name, size: el.files[0].size }; // Metadata only for demo
                     } else {
-                        list.innerHTML = '<li class="atelier-list-item"><div>No hay posts recientes</div></li>';
+                        formData[field.id] = el.value;
                     }
-                }).catch(() => {
-                    const l = document.getElementById('posts-list');
-                    if (l) l.innerHTML = '<li class="atelier-list-item"><div style="color:var(--danger)">Error cargando posts</div></li>';
-                });
-            }
-
-            async executePin(postId) {
-                modal.close();
-                await this.panel.sendRequest('pinPost', { reference: postId });
-            }
-        }
-
-        // ==========================================
-        // ⚙️ SYSTEM MODULE
-        // ==========================================
-
-        class SystemModule extends BaseModule {
-
-            async testWorkflow() {
-                modal.showLoading('Ejecutando Test...', 'Probando workflow en n8n');
-
-                const result = await this.panel.sendRequest('testWorkflow', { mode: 'dry-run' });
-
-                if (result) {
-                    this.panel.metrics.increment('workflowTests');
                 }
-            }
 
-            async runDiagnostics() {
-                const modalContent = `
-                    <div class="atelier-progress">
-                        <div class="atelier-progress-bar" id="diag-progress" style="width: 0%"></div>
-                    </div>
-                    <ul class="atelier-list" id="diagnostics-list">
-                        <li class="atelier-list-item">
-                            <div>
-                                <div class="atelier-list-item-title">Iniciando diagnóstico...</div>
-                            </div>
-                        </li>
-                    </ul>
-                `;
-
-                modal.create({
-                    icon: '🧰',
-                    title: 'Diagnóstico del Sistema',
-                    subtitle: 'Verificando estado de servicios',
-                    content: modalContent
-                });
-
-                // Simulate progress
-                let progress = 0;
-                const progressBar = document.getElementById('diag-progress');
-                const interval = setInterval(() => {
-                    progress += 10;
-                    progressBar.style.width = progress + '%';
-                    if (progress >= 100) clearInterval(interval);
-                }, 200);
-
-                const result = await this.panel.sendRequest('systemDiagnostic', { components: ['all'] });
-
-                if (result) {
-                    this.panel.metrics.increment('diagnosticsRun');
+                if (!isValid) {
+                    errorDiv.textContent = I18n.t('errRequired');
+                    return;
                 }
-            }
 
-            async cleanQueue() {
-                const modalContent = `
-                    <div class="atelier-form-group">
-                        <label class="atelier-form-label">Opciones de Limpieza</label>
-                        <div style="display: flex; flex-direction: column; gap: 12px;">
-                            <label style="display: flex; align-items: center; gap: 8px; color: var(--text);">
-                                <input type="checkbox" id="clean-duplicates" checked> Eliminar duplicadas
-                            </label>
-                            <label style="display: flex; align-items: center; gap: 8px; color: var(--text);">
-                                <input type="checkbox" id="clean-obsolete" checked> Eliminar obsoletas
-                            </label>
-                            <label style="display: flex; align-items: center; gap: 8px; color: var(--text);">
-                                <input type="checkbox" id="clean-failed"> Reintentar fallidas
-                            </label>
-                        </div>
-                    </div>
-                `;
+                UI.setLoading(true);
 
-                modal.create({
-                    icon: '🧼',
-                    title: 'Limpiar Cola',
-                    subtitle: 'Optimiza la cola de publicaciones',
-                    content: modalContent,
-                    actions: `
-                        <button class="atelier-btn atelier-btn-secondary" onclick="modal.close()">Cancelar</button>
-                        <button class="atelier-btn atelier-btn-primary" id="clean-btn">Limpiar</button>
-                    `
-                });
-
-                document.getElementById('clean-btn').onclick = async () => {
-                    const options = {
-                        duplicates: document.getElementById('clean-duplicates').checked,
-                        obsolete: document.getElementById('clean-obsolete').checked,
-                        failed: document.getElementById('clean-failed').checked
-                    };
-
-                    modal.close();
-                    await this.panel.sendRequest('cleanQueue', options);
+                const payload = {
+                    action: actionKey,
+                    requestId: Utils.uuid(),
+                    data: formData,
+                    client: { ts: Date.now(), userAgent: navigator.userAgent }
                 };
-            }
 
-            async listPanels() {
-                modal.showLoading('Cargando Paneles...', 'Obteniendo lista de paneles activos');
-                try {
-                    const response = await this.panel.sendRequest('listActivePanels');
-                    modal.close();
+                // Telemetry Audit
+                Telemetry.audit('SUBMIT', payload);
 
-                    const panels = (response && response.data) ? response.data : [];
-
-                    const content = panels.length ? panels.map(p => `
-                        <li class="atelier-list-item">
-                            <div>
-                                <div class="atelier-list-item-title">${p.name || 'Panel Desconocido'}</div>
-                                <div class="atelier-list-item-meta">${p.status || 'Activo'} • ${p.lastActive || 'N/A'}</div>
-                            </div>
-                            <div class="atelier-list-item-actions">
-                                <button class="atelier-icon-btn" title="Abrir" onclick="window.open('${p.url}', '_blank')">🔗</button>
-                            </div>
-                        </li>
-                    `).join('') : '<li class="atelier-list-item"><div>No hay paneles activos encontrados</div></li>';
-
-                    modal.create({
-                        icon: '🧭',
-                        title: 'Paneles Activos',
-                        subtitle: 'Gestiona tus paneles conectados',
-                        content: `<ul class="atelier-list">${content}</ul>`,
-                        actions: `<button class="atelier-btn atelier-btn-primary" onclick="modal.close()">Cerrar</button>`
-                    });
-
-                } catch (e) {
-                    modal.close();
-                    modal.showError('Error', 'No se pudieron cargar los paneles');
+                // Offline Handling
+                if (!navigator.onLine && !CONFIG.FLAGS.enableMockTester) {
+                    State.queue.push(payload);
+                    localStorage.setItem('panelQueue', JSON.stringify(State.queue));
+                    setTimeout(() => {
+                        UI.setLoading(false);
+                        App.closeModal();
+                        Toast.show(I18n.t('errNetwork'), 'warning');
+                        App.addToHistory(actionKey, null);
+                    }, 500);
+                    return;
                 }
-            }
-        }
 
-        // ==========================================
-        // 🔍 AUDIT MODULE
-        // ==========================================
-
-        class AuditModule extends BaseModule {
-
-            async viewLogs() {
-                modal.showLoading('Cargando Logs...', 'Obteniendo historial del sistema');
                 try {
-                    const response = await this.panel.sendRequest('getSystemLogs', { limit: 20 });
-                    modal.close();
+                    const response = await Network.send(payload);
 
-                    const logs = (response && response.data) ? response.data : this.panel.logs.slice(-20).reverse();
+                    Telemetry.log('SUCCESS', actionKey);
+                    Toast.show(I18n.t('msgSuccess'), 'success');
 
-                    const logsHtml = logs.map(log => `
-                        <li class="atelier-list-item">
-                            <div>
-                                <div class="atelier-list-item-title">${log.action}</div>
-                                <div class="atelier-list-item-meta">
-                                    ${new Date(log.timestamp).toLocaleString()} • ${log.user || 'System'}
-                                </div>
-                            </div>
-                            <span class="atelier-badge ${log.status}">${log.status}</span>
-                        </li>
-                    `).join('');
+                    // Update Preview
+                    if (config.preview) {
+                        const previewHtml = config.preview(response.data || response);
+                        document.getElementById('previewArea').innerHTML = previewHtml;
+                        document.getElementById('previewArea').classList.add('has-data');
 
-                    modal.create({
-                        icon: '📋',
-                        title: 'Registros del Sistema',
-                        subtitle: `Últimas ${logs.length} acciones`,
-                        content: `<ul class="atelier-list" style="max-height:400px;overflow-y:auto;">${logsHtml || '<p style="text-align:center;">No hay registros</p>'}</ul>`,
-                        actions: `
-                            <button class="atelier-btn atelier-btn-secondary" onclick="modal.close()">Cerrar</button>
-                            <button class="atelier-btn atelier-btn-primary" onclick="panel.modules.audit.exportHistory()">Exportar</button>
-                        `
-                    });
-                } catch (e) {
-                    modal.close();
-                    modal.showError('Error', 'Fallo al recuperar logs');
-                }
-            }
-
-            async auditContent() {
-                await this.panel.sendRequest('auditContentQuality');
-            }
-
-            async exportHistory() {
-                modal.close();
-                await this.panel.sendRequest('exportCsvMetrics');
-            }
-        }
-
-        // ==========================================
-        // 🤖 AI MODULE
-        // ==========================================
-
-        class AIModule extends BaseModule {
-            async retrain() {
-                modal.showWarning(
-                    'Reentrenar IA',
-                    'Este proceso puede tomar varios minutos. ¿Continuar?',
-                    async () => {
-                        await this.panel.sendRequest('triggerRetrain', { dataset: 'latest' });
+                        // Add Copy Button
+                        const btn = document.createElement('button');
+                        btn.className = 'btn-primary btn-copy';
+                        btn.textContent = I18n.t('btnCopy');
+                        btn.onclick = () => {
+                            navigator.clipboard.writeText(document.getElementById('previewArea').innerText);
+                            Toast.show(I18n.t('msgCopied'), 'info');
+                        };
+                        document.getElementById('previewArea').appendChild(document.createElement('br'));
+                        document.getElementById('previewArea').appendChild(btn);
                     }
-                );
-            }
-        }
 
-        // ==========================================
-        // 🚀 INITIALIZATION
-        // ==========================================
-        const panel = new AtelierPanel();
-        window.panel = panel;
+                    App.addToHistory(actionKey, true);
+                    App.closeModal();
+                } catch (err) {
+                    console.error(err);
+                    Telemetry.log('ERROR', actionKey);
+                    errorDiv.textContent = I18n.t('errServer');
+                    Toast.show(I18n.t('errServer'), 'error');
+                } finally {
+                    UI.setLoading(false);
+                }
+            },
+
+            addToHistory: (actionKey, success) => {
+                const item = { action: actionKey, ts: Date.now(), success };
+                State.history.unshift(item);
+                if (State.history.length > CONFIG.SETTINGS.maxHistory) State.history.pop();
+                localStorage.setItem('panelHistory', JSON.stringify(State.history));
+                UI.renderHistory();
+            }
+        };
+
+        // Boot
+        document.addEventListener('DOMContentLoaded', App.init);
 
     </script>
-
-
 </body>
 
 </html>
