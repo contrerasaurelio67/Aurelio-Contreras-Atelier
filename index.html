@@ -727,7 +727,7 @@
                 // Llamada real al webhook de producción
                 const response = await fetch(APP.env.url, {
                     method: "POST",
-                    headers: { "Content-Type": "application/json" },
+                    headers: { "Content-Type": "application/json", "X-N8N-API-KEY": "tu_clave_fija_123456" },
                     body: JSON.stringify({
                         action: currentKey,
                         data: data
