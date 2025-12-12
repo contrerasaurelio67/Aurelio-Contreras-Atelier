@@ -11,8 +11,7 @@ scp -i $HOME\.ssh\google_compute_engine "C:\Users\arcom\Panel-n8n\index.html" co
 ssh -i $HOME\.ssh\google_compute_engine contrerasaurelio67@34.148.6.253
 
 ### 4. Ejecuta el despliegue manual con el alias `deploy`
-Una vez dentro de la VM, simplemente escribe:
-deploy
+Una vez dentro de la VM, simplemente escribe: deploy
 
 Este alias ejecuta el script deploy.sh, guarda el log y muestra las últimas líneas automáticamente.
 
