@@ -707,8 +707,11 @@
             if (act.fields) {
                 act.fields.forEach(f => {
                     const el = $(`f_${f.id}`);
-                    if (f.type === 'file' && el.files.length) data[f.id] = { name: el.files[0].name };
-                    else data[f.id] = el.value;
+                    if (f.type === 'file' && el.files.length) {
+                        data[f.id] = { name: el.files[0].name };
+                    } else {
+                        data[f.id] = el.value;
+                    }
                 });
             }
 
@@ -716,31 +719,47 @@
             btn.disabled = true;
             spinner.style.display = 'inline-block';
 
-            // Simulate Network / Call N8N
             try {
-                // Check offline
                 if (!navigator.onLine) {
                     throw new Error('Offline');
                 }
 
-                // If mock mode or just demo:
-                await new Promise(r => setTimeout(r, 1500));
+                // Llamada real al webhook de producción
+                const response = await fetch(APP.env.url, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        action: currentKey,
+                        data: data
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error("Webhook error: " + response.status);
+                }
+
+                const result = await response.json();
 
                 // Success
                 toast(`Acción "${act.title}" completada`, 'success');
                 APP.state.history.unshift({ k: currentKey, ts: Date.now(), ok: true });
                 localStorage.setItem('at_hist', JSON.stringify(APP.state.history));
 
-                // Preview
+                // Preview dinámico con respuesta real
                 const prev = $('previewArea');
-                prev.innerHTML = act.preview ? act.preview(data) : '✅ Operación Exitosa<br><small>Respuesta del servior recibida</small>';
+                prev.innerHTML = act.preview ? act.preview(result) :
+                    '✅ Operación Exitosa<br><small>Respuesta del servidor: ' + JSON.stringify(result) + '</small>';
                 prev.classList.add('active');
 
                 renderHistory();
                 closeModal();
 
             } catch (err) {
-                toast('Error de conexión / Offline', 'error');
+                console.error("Error en webhook:", err);
+                toast('Error de conexión / Webhook', 'error');
+                APP.state.history.unshift({ k: currentKey, ts: Date.now(), ok: false });
+                localStorage.setItem('at_hist', JSON.stringify(APP.state.history));
+                renderHistory();
             } finally {
                 btn.disabled = false;
                 spinner.style.display = 'none';
