@@ -90,6 +90,7 @@
             justify-content: center;
             min-height: 100vh;
             padding: 2rem;
+            position: relative;
         }
 
         button,
@@ -108,23 +109,66 @@
             letter-spacing: -0.02em;
         }
 
-        .container {
+        /* LOGIN SCREEN */
+        .login-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--bg-body);
+            z-index: 5000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.5s ease;
+        }
+
+        .login-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .login-card {
+            background: var(--bg-card);
+            padding: 2.5rem;
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-hover);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .login-logo {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        /* MAIN APP */
+        .app-container {
             width: 100%;
             max-width: 1200px;
             display: grid;
             grid-template-columns: 1fr 340px;
             gap: 2rem;
             align-items: start;
+            opacity: 0;
+            transition: opacity 0.5s ease 0.2s;
+        }
+
+        .app-container.visible {
+            opacity: 1;
         }
 
         @media (max-width: 900px) {
-            .container {
+            .app-container {
                 grid-template-columns: 1fr;
             }
         }
 
-        /* Header & Status */
-        .main-panel header {
+        /* HEADER */
+        header {
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -165,13 +209,36 @@
             background: var(--text-secondary);
         }
 
-        .version-badge {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            opacity: 0.7;
+        .status-dot.warning {
+            background: var(--color-warning);
         }
 
-        /* Cards Grid */
+        .btn-logout {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: var(--color-danger);
+            transition: background 0.2s;
+        }
+
+        .btn-logout:hover {
+            background: var(--bg-body);
+        }
+
+        /* SECTIONS & GRID */
+        .section-title {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin: 2rem 0 1rem 0;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
         .grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
@@ -202,12 +269,6 @@
             outline-offset: 4px;
         }
 
-        .card.disabled {
-            opacity: 0.5;
-            pointer-events: none;
-            filter: grayscale(1);
-        }
-
         .card-icon {
             font-size: 2rem;
             margin-bottom: 1rem;
@@ -225,7 +286,7 @@
             color: var(--text-secondary);
         }
 
-        /* Sidebar */
+        /* SIDEBAR */
         .sidebar {
             display: flex;
             flex-direction: column;
@@ -305,11 +366,7 @@
             color: var(--text-secondary);
         }
 
-        .history-status {
-            font-size: 1.2rem;
-        }
-
-        /* Modal */
+        /* MODAL */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -362,11 +419,10 @@
             cursor: pointer;
             width: 32px;
             height: 32px;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 50%;
-            transition: background var(--transition-fast);
         }
 
         .close-btn:hover {
@@ -410,19 +466,15 @@
             font-weight: 600;
             border-radius: var(--radius-md);
             cursor: pointer;
-            transition: transform 0.1s, background-color 0.2s;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 0.5rem;
+            transition: background-color 0.2s;
         }
 
-        .btn-primary:not(:disabled):hover {
+        .btn-primary:hover {
             background: var(--color-accent-hover);
-        }
-
-        .btn-primary:active {
-            transform: scale(0.98);
         }
 
         .btn-primary:disabled {
@@ -439,28 +491,13 @@
             animation: spin 0.8s linear infinite;
         }
 
-        .btn-copy {
-            margin-top: 1rem;
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
-            width: auto;
-            min-width: 120px;
-            padding: 0.5rem 1rem;
-            font-size: 0.85rem;
-        }
-
-        .btn-copy:hover {
-            background: var(--bg-body);
-        }
-
         @keyframes spin {
             to {
                 transform: rotate(360deg);
             }
         }
 
-        /* Toasts */
+        /* TOASTS */
         #toast-container {
             position: fixed;
             bottom: 24px;
@@ -520,25 +557,31 @@
                 transform: translateY(10px);
             }
         }
-
-        /* Stats Panel (Telemetry) */
-        .stats-panel {
-            margin-top: 1rem;
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-        }
-
-        .stat-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 0.25rem 0;
-        }
     </style>
 </head>
 
 <body>
 
-    <div class="container">
+    <!-- PANTALLA DE ACCESO -->
+    <div id="loginScreen" class="login-screen">
+        <div class="login-card">
+            <div class="login-logo">🔒</div>
+            <h2 style="margin-bottom: 0.5rem;">Atelier Access</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 2rem;">Ingresa tus credenciales</p>
+            <form id="loginForm">
+                <div class="form-group">
+                    <input type="text" id="username" class="form-input" placeholder="Usuario" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="password" class="form-input" placeholder="Contraseña" required>
+                </div>
+                <button type="submit" class="btn-primary">Ingresar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- APP CONTAINER -->
+    <div id="appContainer" class="app-container">
         <!-- Main Panel -->
         <div class="main-panel">
             <header>
@@ -549,19 +592,20 @@
                 <div class="header-badges">
                     <div class="status-badge" id="connStatus">
                         <span class="status-dot"></span>
-                        <span id="connText" data-i18n="statusChecking">Verificando...</span>
+                        <span id="connText">Verificando...</span>
                     </div>
-                    <div class="version-badge" id="versionDisplay">v1.0.0</div>
+                    <button class="btn-logout" id="logoutBtn" title="Cerrar Sesión">⏻</button>
                 </div>
             </header>
 
-            <div class="grid" id="actionsGrid">
-                <!-- Tarjetas dinámicas -->
+            <div id="actionsContainer">
+                <!-- ACCIONES AGRUPADAS SE RENDERIZAN AQUI -->
             </div>
 
-            <!-- Telemetry Stats (Optional) -->
-            <div id="telemetryStats" class="panel-box stats-panel" style="display:none; margin-top:2rem;">
-                <h3 data-i18n="statsTitle">Métricas de Sesión</h3>
+            <!-- Telemetry Stats -->
+            <div id="telemetryStats" class="panel-box"
+                style="display:none; margin-top:2rem; font-size:0.8rem; color:var(--text-secondary);">
+                <h3 data-i18n="statsTitle">Métricas</h3>
                 <div id="statsContent"></div>
             </div>
         </div>
@@ -570,32 +614,28 @@
         <aside class="sidebar">
             <div class="panel-box">
                 <h3 data-i18n="previewTitle">Vista Previa</h3>
-                <div id="previewArea" class="preview-content" data-i18n="previewPlaceholder">
-                    Selecciona una acción para ver el resultado aquí.
-                </div>
+                <div id="previewArea" class="preview-content" data-i18n="previewPlaceholder">...</div>
             </div>
 
             <div class="panel-box">
                 <h3 data-i18n="historyTitle">Últimas Acciones</h3>
-                <ul class="history-list" id="historyList">
-                    <li class="empty-state" data-i18n="historyEmpty">Sin actividad reciente</li>
-                </ul>
+                <ul class="history-list" id="historyList"></ul>
             </div>
         </aside>
     </div>
 
     <!-- Modal -->
-    <div class="modal-overlay" id="modalOverlay" aria-modal="true" role="dialog" aria-labelledby="modalTitle">
-        <div class="modal" id="modalContent">
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
             <div class="modal-header">
                 <h2 id="modalTitle">Acción</h2>
-                <button class="close-btn" id="modalClose" aria-label="Cerrar modal">&times;</button>
+                <button class="close-btn" id="modalClose">&times;</button>
             </div>
             <form id="actionForm" novalidate>
                 <div id="modalBody"></div>
                 <div style="margin-top: 2rem;">
                     <button type="submit" class="btn-primary" id="modalSubmitBtn">
-                        <span class="btn-text" data-i18n="btnExecute">Ejecutar Acción</span>
+                        <span class="btn-text" data-i18n="btnExecute">Ejecutar</span>
                         <div class="spinner" style="display: none;"></div>
                     </button>
                     <div id="formErrors"
@@ -610,558 +650,337 @@
     <div id="toast-container"></div>
 
     <script>
-        /**
-         * =========================================
-         * 0. CONFIGURACIÓN & FEATURE FLAGS
-         * =========================================
-         */
-        const APP_VERSION = '1.0.0';
+        /** ----- CONFIG & CONSTANTS ----- */
+        const APP_VERSION = '1.1.0';
+        const CREDS = { u: 'econtreras', p: 'Ec1330' }; // En producción usar JWT/Backend
 
-        const DEFAULT_ENV = {
-            baseURL: 'https://n8n.aureliocontrerasatelier.com',
-            webhookPath: '/webhook/panel-action',
-            throttleMs: 3000
-        };
-
-        const DEFAULT_FLAGS = {
-            enableImageAction: true,
-            enableTelemetry: true,
-            enableMockTester: false // Set to true to test without N8N backend
-        };
-
-        // Load Config from LocalStorage
+        const DEFAULT_FLAGS = { enableMockTester: false, enableTelemetry: true };
         const CONFIG = {
-            ENV: Object.assign(DEFAULT_ENV, JSON.parse(localStorage.getItem('panelEnv') || '{}')),
-            FLAGS: Object.assign(DEFAULT_FLAGS, JSON.parse(localStorage.getItem('featureFlags') || '{}')),
-            SETTINGS: {
-                maxRetries: 3,
-                toastDuration: 4000,
-                maxHistory: 5,
-                closeOnOverlayClick: true
-            }
+            ENV: { baseURL: 'https://n8n.aureliocontrerasatelier.com/webhook/panel-action', throttleMs: 3000 },
+            FLAGS: Object.assign(DEFAULT_FLAGS, JSON.parse(localStorage.getItem('featureFlags') || '{}'))
         };
 
-        /**
-         * =========================================
-         * 1. I18N ENGINE
-         * =========================================
-         */
+        /** ----- I18N ----- */
         const DICTIONARY = {
             es: {
-                panelTitle: 'Panel de Control',
-                panelSubtitle: 'Aurelio Contreras Atelier',
-                statusChecking: 'Verificando...',
-                statusOnline: 'Conectado',
-                statusOffline: 'Offline (En cola)',
-                statusMock: 'Modo Prueba (Mock)',
-                previewTitle: 'Vista Previa',
-                previewPlaceholder: 'Selecciona una acción para ver el resultado aquí.',
-                historyTitle: 'Últimas Acciones',
-                historyEmpty: 'Sin actividad reciente',
-                btnExecute: 'Ejecutar Acción',
-                btnProcessing: 'Procesando...',
-                btnCopy: 'Copiar Resultado',
-                errRequired: 'Por favor completa los campos requeridos.',
-                errServer: 'Error en el servidor',
-                errNetwork: 'Error de red. Guardado en cola.',
-                msgSuccess: 'Acción ejecutada correctamente',
-                msgCopied: 'Copiado al portapapeles',
-                msgRateLimit: 'Demasiadas solicitudes. Espera un momento.',
-                msgQueueProcessed: 'Acciones offline procesadas',
-                statsTitle: 'Métricas de Sesión'
+                panelTitle: 'Panel de Control', panelSubtitle: 'Aurelio Contreras Atelier',
+                statusOnline: 'En Línea', statusOffline: 'Offline', statusMock: 'Modo Test',
+                previewTitle: 'Vista Previa', previewPlaceholder: 'Selecciona una acción...',
+                historyTitle: 'Historial', historyEmpty: 'Sin actividad',
+                btnExecute: 'Ejecutar', btnProcessing: 'Procesando...',
+                catContent: 'Gestión de Contenido', catSystem: 'Sistema y Operaciones', catAudit: 'Auditoría y Control'
             },
             en: {
-                panelTitle: 'Control Panel',
-                panelSubtitle: 'Aurelio Contreras Atelier',
-                statusChecking: 'Checking...',
-                statusOnline: 'Connected',
-                statusOffline: 'Offline (Queued)',
-                statusMock: 'Test Mode (Mock)',
-                previewTitle: 'Preview',
-                previewPlaceholder: 'Select an action to view results here.',
-                historyTitle: 'Recent Actions',
-                historyEmpty: 'No recent activity',
-                btnExecute: 'Execute Action',
-                btnProcessing: 'Processing...',
-                btnCopy: 'Copy Result',
-                errRequired: 'Please complete required fields.',
-                errServer: 'Server Error',
-                errNetwork: 'Network error. Queued.',
-                msgSuccess: 'Action executed successfully',
-                msgCopied: 'Copied to clipboard',
-                msgRateLimit: 'Too many requests. Please wait.',
-                msgQueueProcessed: 'Offline actions processed',
-                statsTitle: 'Session Metrics'
+                panelTitle: 'Control Panel', panelSubtitle: 'Aurelio Contreras Atelier',
+                statusOnline: 'Online', statusOffline: 'Offline', statusMock: 'Test Mode',
+                previewTitle: 'Preview', previewPlaceholder: 'Select action...',
+                historyTitle: 'History', historyEmpty: 'No activity',
+                btnExecute: 'Execute', btnProcessing: 'Processing...',
+                catContent: 'Content Management', catSystem: 'System & Ops', catAudit: 'Audit & Control'
             }
         };
-
         const I18n = {
             lang: navigator.language.startsWith('es') ? 'es' : 'en',
-            t: (key) => DICTIONARY[I18n.lang][key] || key,
-            updateUI: () => {
-                document.querySelectorAll('[data-i18n]').forEach(el => {
-                    const key = el.getAttribute('data-i18n');
-                    el.textContent = I18n.t(key);
-                });
-            }
+            t: (k) => DICTIONARY[I18n.lang][k] || k,
+            update: () => document.querySelectorAll('[data-i18n]').forEach(el => el.textContent = I18n.t(el.dataset.i18n))
         };
 
-        /**
-         * =========================================
-         * 2. TELEMETRY & AUDIT
-         * =========================================
-         */
-        const Telemetry = {
-            metrics: { success: 0, error: 0, actions: {} },
-
-            log: (type, actionKey) => {
-                if (!CONFIG.FLAGS.enableTelemetry) return;
-
-                // Update counters
-                if (type === 'SUCCESS') Telemetry.metrics.success++;
-                if (type === 'ERROR') Telemetry.metrics.error++;
-                Telemetry.metrics.actions[actionKey] = (Telemetry.metrics.actions[actionKey] || 0) + 1;
-
-                // Update UI if visible
-                Telemetry.renderStats();
-            },
-
-            audit: (event, data) => {
-                // Console Audit
-                console.groupCollapsed(`[AUDIT] ${event} @ ${new Date().toLocaleTimeString()}`);
-                console.log('UserAgent:', navigator.userAgent);
-                console.log('Language:', I18n.lang);
-                console.log('Payload/Data:', data);
-                console.groupEnd();
-            },
-
-            renderStats: () => {
-                const el = document.getElementById('statsContent');
-                if (!el) return;
-                el.innerHTML = `
-                    <div class="stat-row"><span>Success:</span> <span style="color:var(--color-success)">${Telemetry.metrics.success}</span></div>
-                    <div class="stat-row"><span>Errors:</span> <span style="color:var(--color-danger)">${Telemetry.metrics.error}</span></div>
-                    <div style="margin-top:0.5rem; border-top:1px solid var(--border-color); padding-top:0.5rem">
-                        ${Object.entries(Telemetry.metrics.actions).map(([k, v]) => `<div class="stat-row"><span>${k}:</span> <span>${v}</span></div>`).join('')}
-                    </div>
-                `;
-            }
-        };
-
-        /**
-         * =========================================
-         * 3. ACTIONS DEFINITION
-         * =========================================
-         */
-        const ACTIONS_CONFIG = {
+        /** ----- ACTIONS SCHEMA (EXTENDED) ----- */
+        const ACTIONS = {
+            // CATEGORIA: GESTION DE CONTENIDO
             'generate_posts': {
-                title: { es: 'Generar Publicaciones', en: 'Generate Posts' },
-                desc: { es: 'Crear nuevos posts con IA base', en: 'Create new posts with AI' },
+                cat: 'catContent', title: { es: 'Generar Posts', en: 'Generate Posts' },
+                desc: { es: 'Crear contenido con IA', en: 'AI Content Generation' },
                 icon: '✨',
                 fields: [
-                    { id: 'theme', label: { es: 'Tema Principal', en: 'Main Theme' }, type: 'text', placeholder: 'Minimalismo...', required: true },
-                    { id: 'tone', label: { es: 'Tono', en: 'Tone' }, type: 'select', options: ['Elegante', 'Casual', 'Informativo'], required: true }
-                ],
-                preview: (data) => `<strong>Posts:</strong><br>${data.titles ? data.titles.join('<br>') : 'OK'}`
+                    { id: 'topic', label: 'Tema', type: 'text', required: true },
+                    { id: 'style', label: 'Estilo', type: 'select', options: ['Minimal', 'Lujo', 'Story'], required: true }
+                ]
             },
             'schedule_post': {
-                title: { es: 'Programar Publicación', en: 'Schedule Post' },
-                desc: { es: 'Agendar contenido para el futuro', en: 'Schedule content for future' },
+                cat: 'catContent', title: { es: 'Programar', en: 'Schedule' },
+                desc: { es: 'Agendar publicación', en: 'Schedule Post' },
                 icon: '📅',
                 fields: [
-                    { id: 'date', label: { es: 'Fecha', en: 'Date' }, type: 'date', required: true },
-                    { id: 'time', label: { es: 'Hora', en: 'Time' }, type: 'time', required: true },
-                    { id: 'content_id', label: 'ID (Ops)', type: 'text', placeholder: 'Auto' }
-                ],
-                preview: (data) => `✅ <strong>Scheduled</strong><br>${data.scheduledDate || 'TBD'}`
+                    { id: 'date', label: 'Fecha', type: 'date', required: true },
+                    { id: 'time', label: 'Hora', type: 'time', required: true }
+                ]
             },
-            'system_diag': {
-                title: { es: 'Diagnóstico del Sistema', en: 'System Diagnosis' },
-                desc: { es: 'Verificar salud de servicios', en: 'Check service health' },
-                icon: '🩺',
-                fields: [],
-                preview: (data) => `<strong>System Status:</strong><br>${data.healthy ? '🟢 Healthy' : '🔴 Issues'}`
+            'pin_post': {
+                cat: 'catContent', title: { es: 'Fijar Post', en: 'Pin Post' },
+                desc: { es: 'Destacar publicación', en: 'Pin to top' },
+                icon: '📌',
+                fields: [
+                    { id: 'postId', label: 'ID Publicación', type: 'text', required: true },
+                    { id: 'duration', label: 'Duración (días)', type: 'number', placeholder: '7' }
+                ]
             },
             'upload_media': {
-                title: { es: 'Subir Media', en: 'Upload Media' },
-                desc: { es: 'Cargar imagen para post', en: 'Upload image for post' },
+                cat: 'catContent', title: { es: 'Subir Media', en: 'Upload Media' },
+                desc: { es: 'Cargar recursos', en: 'Upload assets' },
                 icon: '📷',
-                flag: 'enableImageAction', // Feature Flag
                 fields: [
-                    { id: 'file', label: { es: 'Imagen (Max 2MB)', en: 'Image (Max 2MB)' }, type: 'file', accept: 'image/*', required: true },
-                    { id: 'caption', label: { es: 'Descripción', en: 'Caption' }, type: 'text' }
+                    { id: 'file', label: 'Archivo', type: 'file', accept: 'image/*', required: true }
+                ]
+            },
+
+            // CATEGORIA: SISTEMA
+            'list_panels': {
+                cat: 'catSystem', title: { es: 'Listar Paneles', en: 'List Panels' },
+                desc: { es: 'Ver paneles activos', en: 'Active panels' },
+                icon: '🎛️',
+                fields: [], // Sin parametros
+                preview: (d) => `<strong>Paneles:</strong><br>${d.panels ? d.panels.join(', ') : 'Lista vacía'}`
+            },
+            'system_diag': {
+                cat: 'catSystem', title: { es: 'Diagnóstico', en: 'Diagnostics' },
+                desc: { es: 'Salud del sistema', en: 'System Health' },
+                icon: '🩺',
+                fields: []
+            },
+
+            // CATEGORIA: AUDITORIA
+            'view_logs': {
+                cat: 'catAudit', title: { es: 'Ver Logs', en: 'View Logs' },
+                desc: { es: 'Auditoría reciente', en: 'Recent logs' },
+                icon: '📜',
+                fields: [
+                    { id: 'limit', label: 'Límite', type: 'number', placeholder: '50' },
+                    { id: 'level', label: 'Nivel', type: 'select', options: ['INFO', 'WARN', 'ERROR'] }
                 ],
-                preview: (data) => `📸 <strong>Uploaded</strong><br>URL: ${data.fileUrl || 'Generated'}`
+                preview: (d) => `<div style="max-height:150px;overflow:auto;font-family:monospace;font-size:0.8em">${d.logs || 'Sin logs'}</div>`
             }
         };
 
-        /**
-         * =========================================
-         * 4. STATE & UTILS
-         * =========================================
-         */
+        /** ----- STATE & UTILS ----- */
         const State = {
             history: JSON.parse(localStorage.getItem('panelHistory') || '[]'),
             queue: JSON.parse(localStorage.getItem('panelQueue') || '[]'),
-            lastActionTime: 0,
-            currentAction: null
+            lastAction: 0,
+            token: localStorage.getItem('panelToken')
         };
 
         const Utils = {
-            uuid: () => 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
-                const r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-                return v.toString(16);
-            }),
-            formatDate: (ts) => new Date(ts).toLocaleString(I18n.lang, {
-                month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
-            })
+            uuid: () => crypto.randomUUID(),
+            date: (ts) => new Date(ts).toLocaleString(I18n.lang),
+            delay: (ms) => new Promise(r => setTimeout(r, ms))
         };
 
-        /**
-         * =========================================
-         * 5. NETWORK ENGINE (MOCK + RETRY)
-         * =========================================
-         */
-        const Network = {
-            send: async (payload) => {
-                // Mock Mode Check
-                if (CONFIG.FLAGS.enableMockTester) {
-                    await new Promise(r => setTimeout(r, 1000)); // Simulate latency
-                    return Network.getMockResponse(payload);
+        /** ----- APP LOGIC ----- */
+        const App = {
+            init: () => {
+                I18n.update();
+
+                // Auth Check
+                if (!State.token) {
+                    document.getElementById('loginScreen').classList.remove('hidden');
+                } else {
+                    App.showMain();
                 }
 
-                // Real Network Call
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 15000);
+                // Render Actions
+                App.renderActions();
+                App.renderHistory();
 
-                try {
-                    const token = localStorage.getItem('panelToken');
-                    const headers = {
-                        'Content-Type': 'application/json',
-                        'X-Request-ID': payload.requestId,
-                        'X-Client-Version': APP_VERSION
-                    };
-                    if (token) headers['Authorization'] = `Bearer ${token}`;
+                // Listeners
+                document.getElementById('loginForm').onsubmit = App.handleLogin;
+                document.getElementById('logoutBtn').onclick = App.logout;
+                document.getElementById('modalClose').onclick = App.closeModal;
+                document.getElementById('modalOverlay').onclick = (e) => { if (e.target.id === 'modalOverlay') App.closeModal(); };
+                document.getElementById('actionForm').onsubmit = App.handleAction;
 
-                    const res = await fetch(CONFIG.ENV.baseURL + CONFIG.ENV.webhookPath, {
-                        method: 'POST',
-                        headers: headers,
-                        body: JSON.stringify(payload),
-                        signal: controller.signal
-                    });
+                window.addEventListener('online', () => Toast.show(I18n.t('statusOnline'), 'success'));
+                window.addEventListener('offline', () => Toast.show(I18n.t('statusOffline'), 'warning'));
+            },
 
-                    clearTimeout(timeoutId);
-                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                    return await res.json();
-                } catch (err) {
-                    clearTimeout(timeoutId);
-                    throw err;
+            showMain: () => {
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('appContainer').classList.add('visible');
+                UI.updateStatus();
+            },
+
+            handleLogin: (e) => {
+                e.preventDefault();
+                const u = document.getElementById('username').value;
+                const p = document.getElementById('password').value;
+
+                if (u === CREDS.u && p === CREDS.p) {
+                    State.token = 'mock-token-' + Date.now();
+                    localStorage.setItem('panelToken', State.token);
+                    App.showMain();
+                } else {
+                    Toast.show('Credenciales inválidas', 'error');
                 }
             },
 
-            getMockResponse: (payload) => {
-                return {
-                    success: true,
-                    mock: true,
-                    data: {
-                        titles: ['Post Demo 1', 'Post Demo 2'],
-                        scheduledDate: '2025-12-15 10:00',
-                        healthy: true,
-                        fileUrl: 'https://via.placeholder.com/150'
-                    }
-                };
+            logout: () => {
+                localStorage.removeItem('panelToken');
+                location.reload();
             },
 
-            processQueue: async () => {
-                if (State.queue.length === 0 || !navigator.onLine) return;
+            renderActions: () => {
+                const container = document.getElementById('actionsContainer');
+                const grouped = {};
 
-                const queueCopy = [...State.queue];
-                State.queue = [];
-                localStorage.setItem('panelQueue', '[]');
-
-                let processed = 0;
-                for (const item of queueCopy) {
-                    try {
-                        await Network.send(item);
-                        App.addToHistory(item.action, true);
-                        processed++;
-                    } catch (e) {
-                        // Re-queue if failed
-                        State.queue.push(item);
-                    }
+                // Group by Category
+                for (const [key, conf] of Object.entries(ACTIONS)) {
+                    const cat = conf.cat || 'catSystem';
+                    if (!grouped[cat]) grouped[cat] = [];
+                    grouped[cat].push({ key, ...conf });
                 }
-                localStorage.setItem('panelQueue', JSON.stringify(State.queue));
-                if (processed > 0) Toast.show(I18n.t('msgQueueProcessed'), 'success');
-                UI.renderHistory();
-            }
-        };
 
-        /**
-         * =========================================
-         * 6. UI MANAGER
-         * =========================================
-         */
-        const UI = {
-            renderGrid: () => {
-                const container = document.getElementById('actionsGrid');
-                container.innerHTML = Object.entries(ACTIONS_CONFIG).map(([key, action]) => {
-                    // Feature Flag Check
-                    if (action.flag && !CONFIG.FLAGS[action.flag]) return '';
-
-                    const title = action.title[I18n.lang] || action.title.es;
-                    const desc = action.desc[I18n.lang] || action.desc.es;
-
-                    return `
-                    <div class="card" role="button" tabindex="0" onclick="App.openModal('${key}')">
-                        <span class="card-icon" aria-hidden="true">${action.icon}</span>
-                        <div class="card-title">${title}</div>
-                        <div class="card-desc">${desc}</div>
-                    </div>`;
-                }).join('');
+                // Generate HTML
+                container.innerHTML = Object.entries(grouped).map(([catKey, items]) => `
+                    <h3 class="section-title">${I18n.t(catKey)}</h3>
+                    <div class="grid">
+                        ${items.map(item => `
+                            <div class="card" onclick="App.openModal('${item.key}')" role="button" tabindex="0">
+                                <span class="card-icon">${item.icon}</span>
+                                <div class="card-title">${item.title[I18n.lang] || item.title.es}</div>
+                                <div class="card-desc">${item.desc[I18n.lang] || item.desc.es}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `).join('');
             },
 
             renderHistory: () => {
-                const container = document.getElementById('historyList');
-                if (State.history.length === 0) {
-                    container.innerHTML = `<li class="empty-state">${I18n.t('historyEmpty')}</li>`;
-                    return;
-                }
-                container.innerHTML = State.history.map(item => `
+                const el = document.getElementById('historyList');
+                if (!State.history.length) return el.innerHTML = `<li class="empty-state">${I18n.t('historyEmpty')}</li>`;
+
+                el.innerHTML = State.history.map(h => `
                     <li class="history-item">
                         <div class="history-meta">
-                            <span class="history-action">${(ACTIONS_CONFIG[item.action]?.title[I18n.lang] || item.action)}</span>
-                            <span class="history-time">${Utils.formatDate(item.ts)}</span>
+                            <span class="history-action">${(ACTIONS[h.action]?.title[I18n.lang] || h.action)}</span>
+                            <span class="history-time">${Utils.date(h.ts)}</span>
                         </div>
-                        <span class="history-status" title="${item.success ? 'Success' : 'Error'}">
-                            ${item.success ? '✅' : '❌'}
-                        </span>
+                        <span>${h.success ? '✅' : '❌'}</span>
                     </li>
                 `).join('');
             },
 
-            updateConnStatus: () => {
-                const dot = document.querySelector('.status-dot');
-                const text = document.getElementById('connText');
+            openModal: (key) => {
+                if (Date.now() - State.lastAction < CONFIG.ENV.throttleMs) return Toast.show('Espera un momento...', 'warning');
 
-                if (CONFIG.FLAGS.enableMockTester) {
-                    dot.className = 'status-dot warning';
-                    dot.style.background = 'var(--color-warning)';
-                    text.textContent = I18n.t('statusMock');
-                    return;
-                }
+                State.currentKey = key;
+                const action = ACTIONS[key];
+                document.getElementById('modalTitle').textContent = action.title[I18n.lang] || action.title.es;
 
-                if (navigator.onLine) {
-                    dot.className = 'status-dot online';
-                    text.textContent = I18n.t('statusOnline');
-                } else {
-                    dot.className = 'status-dot offline';
-                    text.textContent = I18n.t('statusOffline');
-                }
-            },
-
-            setLoading: (isLoading) => {
-                const btn = document.getElementById('modalSubmitBtn');
-                const spinner = btn.querySelector('.spinner');
-                const text = btn.querySelector('.btn-text');
-                btn.disabled = isLoading;
-                spinner.style.display = isLoading ? 'block' : 'none';
-                text.textContent = isLoading ? I18n.t('btnProcessing') : I18n.t('btnExecute');
-            }
-        };
-
-        const Toast = {
-            show: (msg, type = 'info') => {
-                const container = document.getElementById('toast-container');
-                const el = document.createElement('div');
-                el.className = `toast ${type}`;
-                el.textContent = msg;
-                container.appendChild(el);
-                setTimeout(() => {
-                    el.classList.add('hiding');
-                    el.addEventListener('animationend', () => el.remove());
-                }, CONFIG.SETTINGS.toastDuration);
-            }
-        };
-
-        /**
-         * =========================================
-         * 7. MAIN APP CONTROLLER
-         * =========================================
-         */
-        const App = {
-            init: () => {
-                // Initialize I18n
-                I18n.updateUI();
-                document.getElementById('versionDisplay').textContent = `v${APP_VERSION}`;
-
-                if (CONFIG.FLAGS.enableTelemetry) {
-                    document.getElementById('telemetryStats').style.display = 'block';
-                    Telemetry.renderStats();
-                }
-
-                UI.renderGrid();
-                UI.renderHistory();
-                UI.updateConnStatus();
-
-                // Listeners
-                window.addEventListener('online', () => { UI.updateConnStatus(); Network.processQueue(); });
-                window.addEventListener('offline', () => { UI.updateConnStatus(); });
-
-                document.getElementById('modalClose').onclick = App.closeModal;
-                document.getElementById('modalOverlay').onclick = (e) => {
-                    if (CONFIG.SETTINGS.closeOnOverlayClick && e.target.id === 'modalOverlay') App.closeModal();
-                };
-
-                document.getElementById('actionForm').onsubmit = App.handleSubmit;
-            },
-
-            openModal: (actionKey) => {
-                // Rate Limiting Check
-                const now = Date.now();
-                if (now - State.lastActionTime < CONFIG.ENV.throttleMs) {
-                    Toast.show(I18n.t('msgRateLimit'), 'warning');
-                    return;
-                }
-
-                State.currentAction = actionKey;
-                const config = ACTIONS_CONFIG[actionKey];
-
-                document.getElementById('modalTitle').textContent = config.title[I18n.lang];
                 const body = document.getElementById('modalBody');
-
-                // Build Fields
-                if (config.fields.length === 0) {
-                    body.innerHTML = `<p style="text-align:center;color:var(--text-secondary)">${config.desc[I18n.lang]}</p>`;
+                if (action.fields.length === 0) {
+                    body.innerHTML = '<p style="text-align:center;color:var(--text-secondary)">¿Confirmar acción?</p>';
                 } else {
-                    body.innerHTML = config.fields.map(field => {
-                        const label = typeof field.label === 'object' ? field.label[I18n.lang] : field.label;
-                        let inputHtml = '';
-
-                        if (field.type === 'select') {
-                            inputHtml = `<select id="f_${field.id}" class="form-input" ${field.required ? 'required' : ''}>
-                                ${field.options.map(o => `<option value="${o}">${o}</option>`).join('')}
-                            </select>`;
-                        } else {
-                            inputHtml = `<input type="${field.type}" id="f_${field.id}" class="form-input" 
-                                placeholder="${field.placeholder || ''}" ${field.required ? 'required' : ''} 
-                                ${field.accept ? `accept="${field.accept}"` : ''}>`;
+                    body.innerHTML = action.fields.map(f => `
+                        <div class="form-group">
+                            <label class="form-label">${f.label}</label>
+                            ${f.type === 'select'
+                            ? `<select id="f_${f.id}" class="form-input">${f.options.map(o => `<option>${o}</option>`)}</select>`
+                            : `<input type="${f.type}" id="f_${f.id}" class="form-input" ${f.required ? 'required' : ''} ${f.placeholder ? `placeholder="${f.placeholder}"` : ''}>`
                         }
-                        return `<div class="form-group"><label class="form-label">${label}</label>${inputHtml}</div>`;
-                    }).join('');
+                        </div>
+                    `).join('');
                 }
 
                 document.getElementById('modalOverlay').classList.add('open');
-                document.body.style.overflow = 'hidden';
             },
 
             closeModal: () => {
                 document.getElementById('modalOverlay').classList.remove('open');
-                document.body.style.overflow = '';
                 document.getElementById('actionForm').reset();
-                State.currentAction = null;
             },
 
-            handleSubmit: async (e) => {
+            handleAction: async (e) => {
                 e.preventDefault();
-                State.lastActionTime = Date.now();
+                State.lastAction = Date.now();
 
-                const actionKey = State.currentAction;
-                const config = ACTIONS_CONFIG[actionKey];
-                const errorDiv = document.getElementById('formErrors');
-                errorDiv.textContent = '';
+                const key = State.currentKey;
+                const action = ACTIONS[key];
+                const data = {};
 
-                // Validation & Data Collection
-                const formData = {};
-                let isValid = true;
-                for (const field of config.fields) {
-                    const el = document.getElementById(`f_${field.id}`);
-                    if (field.required && !el.value) isValid = false;
-
-                    if (field.type === 'file' && el.files.length > 0) {
-                        formData[field.id] = { name: el.files[0].name, size: el.files[0].size }; // Metadata only for demo
-                    } else {
-                        formData[field.id] = el.value;
-                    }
-                }
-
-                if (!isValid) {
-                    errorDiv.textContent = I18n.t('errRequired');
-                    return;
+                // Collect Data
+                for (const f of action.fields) {
+                    const el = document.getElementById(`f_${f.id}`);
+                    if (f.type === 'file' && el.files[0]) data[f.id] = { name: el.files[0].name };
+                    else data[f.id] = el.value;
                 }
 
                 UI.setLoading(true);
 
                 const payload = {
-                    action: actionKey,
+                    action: key,
+                    data,
                     requestId: Utils.uuid(),
-                    data: formData,
-                    client: { ts: Date.now(), userAgent: navigator.userAgent }
+                    ts: Date.now()
                 };
 
-                // Telemetry Audit
-                Telemetry.audit('SUBMIT', payload);
-
-                // Offline Handling
-                if (!navigator.onLine && !CONFIG.FLAGS.enableMockTester) {
-                    State.queue.push(payload);
-                    localStorage.setItem('panelQueue', JSON.stringify(State.queue));
-                    setTimeout(() => {
-                        UI.setLoading(false);
-                        App.closeModal();
-                        Toast.show(I18n.t('errNetwork'), 'warning');
-                        App.addToHistory(actionKey, null);
-                    }, 500);
-                    return;
-                }
-
+                // Network Logic (Mock or Real)
                 try {
-                    const response = await Network.send(payload);
-
-                    Telemetry.log('SUCCESS', actionKey);
-                    Toast.show(I18n.t('msgSuccess'), 'success');
-
-                    // Update Preview
-                    if (config.preview) {
-                        const previewHtml = config.preview(response.data || response);
-                        document.getElementById('previewArea').innerHTML = previewHtml;
-                        document.getElementById('previewArea').classList.add('has-data');
-
-                        // Add Copy Button
-                        const btn = document.createElement('button');
-                        btn.className = 'btn-primary btn-copy';
-                        btn.textContent = I18n.t('btnCopy');
-                        btn.onclick = () => {
-                            navigator.clipboard.writeText(document.getElementById('previewArea').innerText);
-                            Toast.show(I18n.t('msgCopied'), 'info');
-                        };
-                        document.getElementById('previewArea').appendChild(document.createElement('br'));
-                        document.getElementById('previewArea').appendChild(btn);
+                    let response;
+                    if (CONFIG.FLAGS.enableMockTester || !navigator.onLine) {
+                        await Utils.delay(1000);
+                        response = { success: true, data: { msg: 'Simulated OK' } };
+                        if (!navigator.onLine) Toast.show('Guardado en cola (Offline)', 'warning');
+                    } else {
+                        const res = await fetch(CONFIG.ENV.baseURL, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${State.token}` },
+                            body: JSON.stringify(payload)
+                        });
+                        if (!res.ok) throw new Error('API Error');
+                        response = await res.json();
                     }
 
-                    App.addToHistory(actionKey, true);
+                    Toast.show(I18n.t('btnExecute') + ' OK', 'success');
+
+                    // Preview
+                    const previewHtml = action.preview ? action.preview(response.data || response) : JSON.stringify(response.data || response);
+                    document.getElementById('previewArea').innerHTML = previewHtml;
+                    document.getElementById('previewArea').classList.add('has-data');
+
+                    State.history.unshift({ action: key, ts: Date.now(), success: true });
+                    localStorage.setItem('panelHistory', JSON.stringify(State.history));
+                    App.renderHistory();
                     App.closeModal();
+
                 } catch (err) {
                     console.error(err);
-                    Telemetry.log('ERROR', actionKey);
-                    errorDiv.textContent = I18n.t('errServer');
-                    Toast.show(I18n.t('errServer'), 'error');
+                    Toast.show('Error al ejecutar', 'error');
                 } finally {
                     UI.setLoading(false);
                 }
-            },
-
-            addToHistory: (actionKey, success) => {
-                const item = { action: actionKey, ts: Date.now(), success };
-                State.history.unshift(item);
-                if (State.history.length > CONFIG.SETTINGS.maxHistory) State.history.pop();
-                localStorage.setItem('panelHistory', JSON.stringify(State.history));
-                UI.renderHistory();
             }
         };
 
-        // Boot
-        document.addEventListener('DOMContentLoaded', App.init);
+        const UI = {
+            setLoading: (l) => {
+                const btn = document.getElementById('modalSubmitBtn');
+                btn.disabled = l;
+                btn.querySelector('.spinner').style.display = l ? 'block' : 'none';
+            },
+            updateStatus: () => {
+                const dot = document.querySelector('.status-dot');
+                if (CONFIG.FLAGS.enableMockTester) {
+                    dot.className = 'status-dot warning';
+                    document.getElementById('connText').textContent = I18n.t('statusMock');
+                } else {
+                    dot.className = navigator.onLine ? 'status-dot online' : 'status-dot offline';
+                    document.getElementById('connText').textContent = navigator.onLine ? I18n.t('statusOnline') : I18n.t('statusOffline');
+                }
+            }
+        };
 
+        const Toast = {
+            show: (msg, type) => {
+                const t = document.createElement('div');
+                t.className = `toast ${type}`;
+                t.textContent = msg;
+                document.getElementById('toast-container').appendChild(t);
+                setTimeout(() => t.remove(), 4000);
+            }
+        };
+
+        // Init
+        document.addEventListener('DOMContentLoaded', App.init);
     </script>
 </body>
 
